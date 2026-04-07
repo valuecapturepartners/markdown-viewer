@@ -4,7 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/vcp-md-editor/',
+  base: '/markdown-viewer/',
   plugins: [
     react(),
     VitePWA({
@@ -14,7 +14,7 @@ export default defineConfig({
         name: 'VCP Markdown Editor',
         short_name: 'VCP MD',
         description: 'Markdown editor for VCP Google Drive workspace',
-        start_url: '/vcp-md-editor/',
+        start_url: '/markdown-viewer/',
         display: 'standalone',
         background_color: '#fafaf8',
         theme_color: '#1a1a1a',
