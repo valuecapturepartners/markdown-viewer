@@ -113,19 +113,28 @@ export default function Editor() {
     setSaveStatus('')
   }, [accessToken])
 
-  const openCommentDialog = () => {
-    const sel = editorRef.current?.getSelection() || ''
+  const openCommentDialog = (selText) => {
+    const sel = selText !== undefined ? selText : (editorRef.current?.getSelection() || '')
     setSelectedText(sel)
     setIsCommentOpen(true)
   }
 
   const handleCommentInsert = (markup) => {
-    editorRef.current?.insertText(markup)
+    if (editorRef.current) {
+      // CodeMirror is mounted: use it so cursor position is preserved
+      editorRef.current.insertText(markup)
+    } else {
+      // Mobile preview mode: CodeMirror not rendered, patch markdown directly
+      setContent(prev => {
+        if (selectedText && prev.includes(selectedText)) return prev.replace(selectedText, markup)
+        return prev + '\n' + markup
+      })
+    }
     setIsCommentOpen(false)
     setSelectedText('')
   }
 
-  const effectiveView = isMobile && viewMode === 'split' ? 'editor' : viewMode
+  const effectiveView = isMobile && viewMode === 'split' ? 'preview' : viewMode
 
   return (
     <div className="editor-shell">
@@ -228,7 +237,8 @@ export default function Editor() {
             <div className="preview-pane">
               <PreviewPane
                 content={content}
-                onChange={effectiveView === 'split' ? setContent : undefined}
+                onChange={effectiveView === 'split' || (isMobile && effectiveView === 'preview') ? setContent : undefined}
+                onCommentRequest={openCommentDialog}
               />
             </div>
           )}
@@ -242,13 +252,20 @@ export default function Editor() {
             className={`tab-btn ${effectiveView === 'editor' ? 'active' : ''}`}
             onClick={() => setViewMode('editor')}
           >
-            Edit
+            Source
+          </button>
+          <button
+            className="tab-btn tab-btn-comment"
+            onClick={() => openCommentDialog()}
+            title="Add comment"
+          >
+            💬
           </button>
           <button
             className={`tab-btn ${effectiveView === 'preview' ? 'active' : ''}`}
             onClick={() => setViewMode('preview')}
           >
-            Preview
+            Review
           </button>
         </nav>
       )}

@@ -674,3 +674,85 @@ html, body, #root {
 }
 
 .fb-shared-drive .fb-icon { filter: none; }
+
+/* ── Preview floating toolbar ────────────────────────────── */
+.preview-floating-bar {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: #2a2a2a;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 4px 6px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  z-index: 300;
+  width: 260px;
+  user-select: none;
+}
+
+.pfb-btn {
+  background: transparent;
+  border: none;
+  border-radius: 5px;
+  color: #ccc;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 5px 8px;
+  transition: background 0.1s, color 0.1s;
+  white-space: nowrap;
+}
+.pfb-btn:hover { background: #3a3a3a; color: #fff; }
+
+.pfb-comment { color: #7eb8f7; font-size: 15px; padding: 4px 6px; }
+.pfb-highlight { color: #f5d060; }
+.pfb-insert   { color: #6bcb77; font-size: 16px; font-weight: 700; }
+.pfb-delete   { color: #e07070; font-size: 16px; font-weight: 700; }
+
+.pfb-sep {
+  width: 1px;
+  height: 18px;
+  background: #444;
+  margin: 0 2px;
+  flex-shrink: 0;
+}
+
+/* ── Comment tap popover ─────────────────────────────────── */
+.comment-tap-popover {
+  position: fixed;
+  background: #2d2d3a;
+  border: 1px solid #555;
+  border-radius: 8px;
+  padding: 10px 12px;
+  max-width: 280px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+  z-index: 300;
+}
+
+.ctp-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.ctp-header strong { color: #7eb8f7; font-size: 12px; }
+.ctp-header time   { color: #888; font-size: 11px; flex: 1; }
+
+.ctp-close {
+  background: transparent;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0 2px;
+  line-height: 1;
+}
+.ctp-close:hover { color: #ccc; }
+
+.ctp-text {
+  color: #ddd;
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+}

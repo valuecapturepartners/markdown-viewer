@@ -26,10 +26,11 @@
     overflow: hidden;
   }
 
-  /* Mobile tab bar */
+  /* Mobile tab bar — 3 buttons, safe area aware */
   .mobile-tabs {
     display: flex;
-    height: 48px;
+    height: 52px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
     flex-shrink: 0;
     background: #242424;
     border-top: 1px solid #333;
@@ -40,15 +41,25 @@
     background: transparent;
     border: none;
     color: #888;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     cursor: pointer;
     transition: color 0.15s;
+    min-height: 44px;
   }
 
   .tab-btn.active {
     color: #fff;
     border-bottom: 2px solid #4285F4;
+  }
+
+  /* Comment button in tab bar — narrower, always highlighted */
+  .tab-btn-comment {
+    flex: 0 0 52px;
+    font-size: 18px;
+    border-left: 1px solid #333;
+    border-right: 1px solid #333;
+    color: #7eb8f7;
   }
 
   /* Dialog: full width on small screens */
@@ -57,10 +68,44 @@
     max-height: 85vh;
   }
 
-  /* Preview padding reduction */
+  /* Preview: comfortable reading/editing */
   .preview-content {
     padding: 16px;
+    font-size: 15px;
+    line-height: 1.7;
+    /* Keep content above tab bar */
+    padding-bottom: calc(16px + 52px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Bigger touch targets for floating toolbar on mobile */
+  .pfb-btn {
+    padding: 8px 10px;
+    font-size: 15px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .preview-floating-bar {
+    width: calc(100vw - 16px);
+    left: 8px !important;
+    border-radius: 12px;
+    padding: 4px 8px;
+  }
+
+  /* Comment popover: wider on mobile */
+  .comment-tap-popover {
+    max-width: calc(100vw - 24px);
     font-size: 14px;
+  }
+
+  /* Make critic comments tappable (no hover on mobile) */
+  .critic-comment {
+    cursor: pointer;
+  }
+  .critic-comment .critic-comment-bubble {
+    display: none !important; /* suppress hover bubbles; tap popover handles it */
   }
 }
 
