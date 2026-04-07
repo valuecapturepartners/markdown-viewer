@@ -42,6 +42,8 @@ export const CriticSubstitution = Node.create({
       'data-new': node.attrs.new,
       contenteditable: 'false',
     },
+    ['del', { class: 'critic-deletion' }, node.attrs.old],
+    ['ins', { class: 'critic-insertion' }, node.attrs.new],
   ],
   parseHTML: () => [{
     tag: 'span.critic-sub',

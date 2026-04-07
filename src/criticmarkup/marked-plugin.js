@@ -4,7 +4,11 @@ function applyCriticMarkup(html) {
   // Order matters: substitution before deletion/insertion to avoid overlap
   html = html.replace(
     /\{~~([\s\S]*?)~>([\s\S]*?)~~\}/g,
-    (m) => `<span class="critic-sub" data-critic="${encodeURIComponent(m)}"><del class="critic-deletion">$1</del><ins class="critic-insertion">$2</ins></span>`,
+    (m, oldPart, newPart) => {
+      const o = oldPart.trim().replace(/"/g, '&quot;')
+      const n = newPart.trim().replace(/"/g, '&quot;')
+      return `<span class="critic-sub" data-old="${o}" data-new="${n}" contenteditable="false"><del class="critic-deletion">${oldPart.trim()}</del><ins class="critic-insertion">${newPart.trim()}</ins></span>`
+    },
   )
   html = html.replace(
     /\{\+\+([\s\S]*?)\+\+\}/g,
