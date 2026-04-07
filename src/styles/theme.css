@@ -1,0 +1,87 @@
+/* ── CSS custom properties — light (default) and dark ─────── */
+
+:root {
+  color-scheme: light;
+
+  /* Backgrounds */
+  --bg:        #ffffff;
+  --bg-2:      #f5f5f5;
+  --bg-3:      #ebebeb;
+  --bg-input:  #ffffff;
+  --bg-hover:  #eeeeee;
+  --bg-code:   #f0f0f0;
+  --bg-active: #ddeaff;
+
+  /* Borders */
+  --border:    #ddd;
+  --border-2:  #ccc;
+
+  /* Text */
+  --text:      #1a1a1a;
+  --text-2:    #444;
+  --text-3:    #777;
+  --text-4:    #aaa;
+  --text-head: #0d0d0d;
+  --text-code: #c04800;
+  --text-link: #2060cc;
+  --text-placeholder: #bbb;
+
+  /* Accent */
+  --accent:    #4285F4;
+  --accent-bg: #e8f0fe;
+
+  /* Functional colours — CriticMarkup */
+  --green:         #2a8a3a;
+  --green-bg:      rgba(30, 140, 60, 0.12);
+  --green-border:  rgba(30, 140, 60, 0.35);
+  --red:           #cc3333;
+  --red-bg:        rgba(200, 50, 50, 0.10);
+  --yellow:        #a07800;
+  --yellow-bg:     rgba(180, 140, 0, 0.12);
+  --blue:          #2860c8;
+  --blue-bg:       rgba(40, 96, 200, 0.10);
+
+  /* Shadows */
+  --shadow:    rgba(0,0,0,0.10);
+  --shadow-lg: rgba(0,0,0,0.16);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --bg:        #1a1a1a;
+  --bg-2:      #242424;
+  --bg-3:      #2a2a2a;
+  --bg-input:  #1a1a1a;
+  --bg-hover:  #333;
+  --bg-code:   #2a2a2a;
+  --bg-active: #1a2f4a;
+
+  --border:    #333;
+  --border-2:  #444;
+
+  --text:      #e8e8e4;
+  --text-2:    #bbb;
+  --text-3:    #888;
+  --text-4:    #555;
+  --text-head: #f0f0ec;
+  --text-code: #e6a87c;
+  --text-link: #6ab0f5;
+  --text-placeholder: #444;
+
+  --accent:    #4285F4;
+  --accent-bg: #1e3a5f;
+
+  --green:         #6bcb77;
+  --green-bg:      rgba(80, 200, 100, 0.15);
+  --green-border:  rgba(80, 200, 100, 0.40);
+  --red:           #e07070;
+  --red-bg:        rgba(220, 80, 80, 0.12);
+  --yellow:        #f5d060;
+  --yellow-bg:     rgba(255, 220, 50, 0.18);
+  --blue:          #7eb8f7;
+  --blue-bg:       rgba(100, 160, 255, 0.15);
+
+  --shadow:    rgba(0,0,0,0.50);
+  --shadow-lg: rgba(0,0,0,0.60);
+}

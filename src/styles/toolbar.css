@@ -8,7 +8,7 @@
   display: inline-block;
   width: 1px;
   height: 18px;
-  background: #444;
+  background: var(--border-2);
   margin: 0 4px;
 }
 
@@ -22,13 +22,13 @@
   border-color: transparent;
 }
 .comment-btn:hover {
-  color: #f5d060;
+  color: var(--yellow);
   background: #2a2a1a;
-  border-color: #555;
+  border-color: var(--text-4);
 }
 
 .save-btn {
-  color: #6bcb77;
+  color: var(--green);
 }
 .save-btn:hover {
   color: #80e080;

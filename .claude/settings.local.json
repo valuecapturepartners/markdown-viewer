@@ -25,7 +25,8 @@
       "Bash(npx vite:*)",
       "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(d['version']\\)\")",
       "Bash(jobs)",
-      "Bash(npm test:*)"
+      "Bash(npm test:*)",
+      "Bash(python3:*)"
     ]
   }
 }

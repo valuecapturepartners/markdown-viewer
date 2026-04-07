@@ -1,5 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react'
-import { EditorState } from '@codemirror/state'
+import { EditorState, Compartment } from '@codemirror/state'
 import {
   EditorView,
   keymap,
@@ -19,10 +19,11 @@ import { markdown } from '@codemirror/lang-markdown'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { criticMarkupExtension } from '../criticmarkup/cm-extension.js'
 
-const CodeMirrorPane = forwardRef(function CodeMirrorPane({ content, onChange }, ref) {
+const themeCompartment = new Compartment()
+
+const CodeMirrorPane = forwardRef(function CodeMirrorPane({ content, onChange, darkMode = false }, ref) {
   const containerRef = useRef(null)
   const viewRef = useRef(null)
-  // Track whether the last content change came from the editor itself
   const editorChangedRef = useRef(false)
 
   useImperativeHandle(ref, () => ({
@@ -80,7 +81,7 @@ const CodeMirrorPane = forwardRef(function CodeMirrorPane({ content, onChange },
         history(),
         keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
         markdown(),
-        oneDark,
+        themeCompartment.of(darkMode ? oneDark : []),
         criticMarkupExtension,
         EditorView.updateListener.of((update) => {
           if (update.docChanged) {
@@ -107,6 +108,13 @@ const CodeMirrorPane = forwardRef(function CodeMirrorPane({ content, onChange },
     return () => view.destroy()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Swap CodeMirror theme when darkMode prop changes
+  useEffect(() => {
+    const view = viewRef.current
+    if (!view) return
+    view.dispatch({ effects: themeCompartment.reconfigure(darkMode ? oneDark : []) })
+  }, [darkMode])
 
   // Sync external content changes (e.g. file load) — but skip if we just typed
   useEffect(() => {

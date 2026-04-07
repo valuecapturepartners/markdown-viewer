@@ -3,7 +3,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #1a1a1a;
+  background: var(--bg);
   overflow: hidden;
 }
 
@@ -14,7 +14,7 @@
   padding: 0 16px;
   height: 48px;
   flex-shrink: 0;
-  background: #242424;
+  background: var(--bg-2);
   border-bottom: 1px solid #333;
 }
 
@@ -26,7 +26,7 @@
 
 .capture-username {
   font-size: 13px;
-  color: #aaa;
+  color: var(--text-4);
 }
 
 .capture-body {
@@ -52,10 +52,10 @@
 
 /* ── Textarea ────────────────────────────────────────────── */
 .capture-textarea {
-  background: #242424;
+  background: var(--bg-2);
   border: 1px solid #3a3a3a;
   border-radius: 8px;
-  color: #e8e8e4;
+  color: var(--text);
   font-size: 15px;
   line-height: 1.6;
   min-height: 180px;
@@ -67,10 +67,10 @@
   transition: border-color 0.15s;
 }
 .capture-textarea:focus {
-  border-color: #555;
+  border-color: var(--text-4);
 }
 .capture-textarea::placeholder {
-  color: #555;
+  color: var(--text-4);
 }
 
 /* ── Gemini button ───────────────────────────────────────── */
@@ -96,7 +96,7 @@
 }
 
 .capture-error {
-  color: #e07070;
+  color: var(--red);
   font-size: 13px;
   margin: 0;
 }
@@ -119,7 +119,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  color: #666;
+  color: var(--text-4);
 }
 
 /* ── Context chips ───────────────────────────────────────── */
@@ -130,20 +130,20 @@
 }
 
 .chip {
-  background: #2a2a2a;
+  background: var(--bg-3);
   border: 1px solid #3a3a3a;
   border-radius: 20px;
-  color: #aaa;
+  color: var(--text-4);
   cursor: pointer;
   font-size: 13px;
   padding: 5px 14px;
   transition: background 0.1s, color 0.1s, border-color 0.1s;
 }
-.chip:hover { background: #333; color: #ddd; border-color: #555; }
+.chip:hover { background: var(--border); color: var(--text-2); border-color: var(--text-4); }
 .chip.active {
   background: #1e3a5f;
   border-color: #4285F4;
-  color: #7eb8f7;
+  color: var(--blue);
 }
 
 /* ── Type toggle ─────────────────────────────────────────── */
@@ -153,44 +153,44 @@
 }
 
 .toggle-btn {
-  background: #2a2a2a;
+  background: var(--bg-3);
   border: 1px solid #3a3a3a;
   border-radius: 6px;
-  color: #aaa;
+  color: var(--text-4);
   cursor: pointer;
   flex: 1;
   font-size: 13px;
   padding: 8px 12px;
   transition: background 0.1s, color 0.1s, border-color 0.1s;
 }
-.toggle-btn:hover { background: #333; color: #ddd; }
+.toggle-btn:hover { background: var(--border); color: var(--text-2); }
 .toggle-btn.active {
   background: #1e3a5f;
   border-color: #4285F4;
-  color: #7eb8f7;
+  color: var(--blue);
 }
 
 /* ── Task title input ────────────────────────────────────── */
 .task-title-input {
-  background: #242424;
+  background: var(--bg-2);
   border: 1px solid #3a3a3a;
   border-radius: 6px;
-  color: #e8e8e4;
+  color: var(--text);
   font-size: 14px;
   outline: none;
   padding: 9px 12px;
   width: 100%;
   transition: border-color 0.15s;
 }
-.task-title-input:focus { border-color: #555; }
-.task-title-input::placeholder { color: #555; }
+.task-title-input:focus { border-color: var(--text-4); }
+.task-title-input::placeholder { color: var(--text-4); }
 
 /* ── Save button ─────────────────────────────────────────── */
 .save-inbox-btn {
   background: #1a5c2a;
   border: 1px solid #2a8a3a;
   border-radius: 8px;
-  color: #6bcb77;
+  color: var(--green);
   cursor: pointer;
   font-size: 15px;
   font-weight: 600;
@@ -208,7 +208,7 @@
 }
 
 .save-confirmation {
-  color: #6bcb77;
+  color: var(--green);
   font-size: 13px;
   margin: 0;
   text-align: center;
@@ -221,10 +221,10 @@
 }
 
 .capture-action-btn {
-  background: #242424;
+  background: var(--bg-2);
   border: 1px solid #3a3a3a;
   border-radius: 8px;
-  color: #aaa;
+  color: var(--text-4);
   cursor: pointer;
   flex: 1;
   font-size: 14px;
@@ -232,9 +232,9 @@
   transition: background 0.1s, color 0.1s;
 }
 .capture-action-btn:hover {
-  background: #333;
-  color: #ddd;
-  border-color: #555;
+  background: var(--border);
+  color: var(--text-2);
+  border-color: var(--text-4);
 }
 
 /* ── Mobile adjustments ─────────────────────────────────── */

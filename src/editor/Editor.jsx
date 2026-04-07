@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useTheme } from '../hooks/useTheme.js'
 import { useAuth } from '../auth/auth-context.jsx'
 import CodeMirrorPane from './CodeMirrorPane.jsx'
 import TiptapPane from './TiptapPane.jsx'
@@ -118,6 +119,7 @@ export default function Editor({ onOpenCapture }) {
   const [currentBrowseFolder, setCurrentBrowseFolder] = useState(null)
   const [showDiag, setShowDiag] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
+  const [darkMode, setDarkMode] = useTheme()
   const [isTracking, setIsTracking] = useState(false)
 
   // Reload last open file on mount
@@ -298,6 +300,13 @@ export default function Editor({ onOpenCapture }) {
               title={userInfo.name}
             />
           )}
+          <button
+            className="theme-btn"
+            onClick={() => setDarkMode(d => !d)}
+            title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {darkMode ? '☀' : '🌙'}
+          </button>
           <button className="toolbar-btn" onClick={() => setShowHelp(true)} title="Help">
             ?
           </button>
@@ -346,6 +355,7 @@ export default function Editor({ onOpenCapture }) {
                 ref={editorRef}
                 content={content}
                 onChange={setContent}
+                darkMode={darkMode}
               />
             </div>
           )}

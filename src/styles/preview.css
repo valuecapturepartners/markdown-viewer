@@ -1,7 +1,7 @@
 .preview-pane {
   overflow: hidden;
   height: 100%;
-  background: #1e1e1e;
+  background: var(--bg);
   display: flex;
   flex-direction: column;
 }
@@ -10,16 +10,16 @@
   display: flex;
   gap: 2px;
   padding: 4px 8px;
-  border-bottom: 1px solid #2a2a2a;
+  border-bottom: 1px solid var(--bg-3);
   flex-shrink: 0;
-  background: #1a1a1a;
+  background: var(--bg);
 }
 
 .pane-mode-btn {
   background: transparent;
   border: none;
   border-radius: 3px;
-  color: #666;
+  color: var(--text-4);
   cursor: pointer;
   font-size: 11px;
   font-weight: 500;
@@ -27,8 +27,8 @@
   text-transform: uppercase;
   letter-spacing: 0.4px;
 }
-.pane-mode-btn:hover { color: #bbb; background: #2a2a2a; }
-.pane-mode-btn.active { color: #ccc; background: #2a2a2a; }
+.pane-mode-btn:hover { color: var(--text-2); background: var(--bg-3); }
+.pane-mode-btn.active { color: var(--text-2); background: var(--bg-3); }
 
 /* When preview pane is in edit mode, CodeMirror fills remaining height */
 .preview-pane .cm-container {
@@ -47,7 +47,7 @@
   max-width: 760px;
   margin: 0 auto;
   padding: 24px 28px;
-  color: #ddd;
+  color: var(--text-2);
   font-size: 15px;
   line-height: 1.75;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -57,24 +57,24 @@
 .preview-content h2,
 .preview-content h3,
 .preview-content h4 {
-  color: #f0f0ec;
+  color: var(--text-head);
   margin: 1.5em 0 0.5em;
   line-height: 1.3;
 }
 
 .preview-content h1 { font-size: 1.9em; border-bottom: 1px solid #333; padding-bottom: 0.3em; }
-.preview-content h2 { font-size: 1.45em; border-bottom: 1px solid #2a2a2a; padding-bottom: 0.2em; }
+.preview-content h2 { font-size: 1.45em; border-bottom: 1px solid var(--bg-3); padding-bottom: 0.2em; }
 .preview-content h3 { font-size: 1.2em; }
 .preview-content h4 { font-size: 1em; }
 
 .preview-content p { margin-bottom: 1em; }
 
-.preview-content a { color: #6ab0f5; text-decoration: none; }
+.preview-content a { color: var(--text-link); text-decoration: none; }
 .preview-content a:hover { text-decoration: underline; }
 
 .preview-content code {
-  background: #2a2a2a;
-  color: #e6a87c;
+  background: var(--bg-3);
+  color: var(--text-code);
   padding: 2px 5px;
   border-radius: 3px;
   font-family: 'JetBrains Mono', monospace;
@@ -82,7 +82,7 @@
 }
 
 .preview-content pre {
-  background: #242424;
+  background: var(--bg-2);
   border: 1px solid #333;
   border-radius: 6px;
   padding: 14px 16px;
@@ -92,12 +92,12 @@
 
 .preview-content pre code {
   background: transparent;
-  color: #ccc;
+  color: var(--text-2);
   padding: 0;
 }
 
 .preview-content blockquote {
-  border-left: 3px solid #555;
+  border-left: 3px solid var(--text-4);
   margin: 0 0 1em;
   padding: 0.5em 1em;
   color: #999;
@@ -126,8 +126,8 @@
 }
 
 .preview-content th {
-  background: #2a2a2a;
-  color: #f0f0ec;
+  background: var(--bg-3);
+  color: var(--text-head);
 }
 
 .preview-content hr {
@@ -167,12 +167,12 @@
   margin: 0 auto;
   padding: 24px 28px;
   min-height: 100%;
-  color: #ddd;
+  color: var(--text-2);
   font-size: 15px;
   line-height: 1.75;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   outline: none;
-  caret-color: #7eb8f7;
+  caret-color: var(--blue);
 }
 
 /* Headings */
@@ -180,24 +180,24 @@
 .ProseMirror h2,
 .ProseMirror h3,
 .ProseMirror h4 {
-  color: #f0f0ec;
+  color: var(--text-head);
   margin: 1.5em 0 0.5em;
   line-height: 1.3;
 }
 .ProseMirror h1 { font-size: 1.9em; border-bottom: 1px solid #333; padding-bottom: 0.3em; }
-.ProseMirror h2 { font-size: 1.45em; border-bottom: 1px solid #2a2a2a; padding-bottom: 0.2em; }
+.ProseMirror h2 { font-size: 1.45em; border-bottom: 1px solid var(--bg-3); padding-bottom: 0.2em; }
 .ProseMirror h3 { font-size: 1.2em; }
 .ProseMirror h4 { font-size: 1em; }
 
 .ProseMirror p { margin-bottom: 1em; }
 .ProseMirror p:last-child { margin-bottom: 0; }
 
-.ProseMirror a { color: #6ab0f5; text-decoration: none; }
+.ProseMirror a { color: var(--text-link); text-decoration: none; }
 .ProseMirror a:hover { text-decoration: underline; }
 
 .ProseMirror code {
-  background: #2a2a2a;
-  color: #e6a87c;
+  background: var(--bg-3);
+  color: var(--text-code);
   padding: 2px 5px;
   border-radius: 3px;
   font-family: 'JetBrains Mono', monospace;
@@ -205,17 +205,17 @@
 }
 
 .ProseMirror pre {
-  background: #242424;
+  background: var(--bg-2);
   border: 1px solid #333;
   border-radius: 6px;
   padding: 14px 16px;
   overflow-x: auto;
   margin-bottom: 1em;
 }
-.ProseMirror pre code { background: transparent; color: #ccc; padding: 0; }
+.ProseMirror pre code { background: transparent; color: var(--text-2); padding: 0; }
 
 .ProseMirror blockquote {
-  border-left: 3px solid #555;
+  border-left: 3px solid var(--text-4);
   margin: 0 0 1em;
   padding: 0.5em 1em;
   color: #999;
@@ -230,7 +230,7 @@
 /* Placeholder */
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
-  color: #555;
+  color: var(--text-4);
   pointer-events: none;
   float: left;
   height: 0;
@@ -245,11 +245,11 @@
   display: flex;
   align-items: center;
   gap: 2px;
-  background: #2a2a2a;
-  border: 1px solid #444;
+  background: var(--bg-3);
+  border: 1px solid var(--border-2);
   border-radius: 8px;
   padding: 4px 6px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  box-shadow: 0 4px 16px var(--shadow-lg);
   z-index: 300;
 }
 
@@ -257,7 +257,7 @@
   background: transparent;
   border: none;
   border-radius: 5px;
-  color: #ccc;
+  color: var(--text-2);
   cursor: pointer;
   font-size: 13px;
   font-weight: 500;
@@ -266,17 +266,17 @@
   min-height: 32px;
 }
 .tb-btn:hover { background: #3a3a3a; color: #fff; }
-.tb-btn.on    { background: #333; color: #fff; }
+.tb-btn.on    { background: var(--border); color: #fff; }
 
-.tb-comment   { color: #7eb8f7; font-size: 15px; }
-.tb-highlight { color: #f5d060; }
-.tb-insert    { color: #6bcb77; font-size: 16px; font-weight: 700; }
-.tb-delete    { color: #e07070; font-size: 16px; font-weight: 700; }
+.tb-comment   { color: var(--blue); font-size: 15px; }
+.tb-highlight { color: var(--yellow); }
+.tb-insert    { color: var(--green); font-size: 16px; font-weight: 700; }
+.tb-delete    { color: var(--red); font-size: 16px; font-weight: 700; }
 
 .tb-sep {
   width: 1px;
   height: 18px;
-  background: #444;
+  background: var(--border-2);
   margin: 0 2px;
   flex-shrink: 0;
 }
@@ -287,8 +287,8 @@
   display: inline;
   cursor: default;
 }
-.ProseMirror .critic-sub del { color: #e07070; text-decoration: line-through; background: rgba(220,80,80,.12); }
-.ProseMirror .critic-sub ins { color: #6bcb77; text-decoration: none; background: rgba(80,200,100,.15); }
+.ProseMirror .critic-sub del { color: var(--red); text-decoration: line-through; background: var(--red-bg); }
+.ProseMirror .critic-sub ins { color: var(--green); text-decoration: none; background: var(--green-bg); }
 
 /* Comment atom node */
 .ProseMirror .critic-comment {

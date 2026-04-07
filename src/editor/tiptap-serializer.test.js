@@ -186,7 +186,7 @@ describe('CriticComment node', () => {
     expect(r).toBe('{>> @bob (2026-04-07): ok <<}')
   })
 })
-
+22
 // ─── mixed content ────────────────────────────────────────────────────────────
 
 describe('mixed inline content', () => {

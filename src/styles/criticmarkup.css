@@ -1,27 +1,27 @@
 /* ── CodeMirror editor highlighting ─────────────────────── */
-.cm-critic-insertion  { background: rgba(80, 200, 100, 0.18); color: #6bcb77; }
-.cm-critic-deletion   { background: rgba(220, 80,  80, 0.18); color: #e07070; text-decoration: line-through; }
+.cm-critic-insertion  { background: var(--green-bg); color: var(--green); }
+.cm-critic-deletion   { background: rgba(220, 80,  80, 0.18); color: var(--red); text-decoration: line-through; }
 .cm-critic-substitution { background: rgba(255, 160, 40, 0.15); color: #f0a050; }
-.cm-critic-highlight  { background: rgba(255, 220, 50, 0.20); color: #f5d060; }
-.cm-critic-comment    { background: rgba(100, 160, 255, 0.15); color: #7eb8f7; font-style: italic; }
+.cm-critic-highlight  { background: rgba(255, 220, 50, 0.20); color: var(--yellow); }
+.cm-critic-comment    { background: var(--blue-bg); color: var(--blue); font-style: italic; }
 
 /* ── Preview rendering ───────────────────────────────────── */
 ins.critic-insertion {
-  background: rgba(80, 200, 100, 0.15);
-  color: #6bcb77;
+  background: var(--green-bg);
+  color: var(--green);
   text-decoration: none;
   border-bottom: 1px solid rgba(80, 200, 100, 0.4);
 }
 
 del.critic-deletion {
-  background: rgba(220, 80, 80, 0.12);
-  color: #e07070;
+  background: var(--red-bg);
+  color: var(--red);
   text-decoration: line-through;
 }
 
 mark.critic-highlight {
-  background: rgba(255, 220, 50, 0.18);
-  color: #f5d060;
+  background: var(--yellow-bg);
+  color: var(--yellow);
   padding: 0 1px;
   border-radius: 2px;
 }
@@ -44,27 +44,27 @@ mark.critic-highlight {
   bottom: calc(100% + 6px);
   left: 50%;
   transform: translateX(-50%);
-  background: #2d2d3a;
-  border: 1px solid #555;
+  background: var(--bg-2);
+  border: 1px solid var(--text-4);
   border-radius: 6px;
   padding: 8px 12px;
   font-size: 12px;
-  color: #ddd;
+  color: var(--text-2);
   white-space: nowrap;
   max-width: 320px;
   white-space: normal;
   z-index: 100;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 12px var(--shadow);
   pointer-events: none;
 }
 
 .critic-comment-bubble strong {
-  color: #7eb8f7;
+  color: var(--blue);
   font-size: 11px;
 }
 
 .critic-comment-bubble time {
-  color: #888;
+  color: var(--text-3);
   font-size: 11px;
   margin-left: 4px;
 }
