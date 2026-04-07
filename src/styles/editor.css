@@ -483,6 +483,7 @@ html, body, #root {
   background: var(--bg-2);
   border-right: 1px solid var(--border);
   overflow: hidden;
+  position: relative;
 }
 
 .folder-browser.mobile-drawer {
@@ -538,6 +539,30 @@ html, body, #root {
 .fb-close-btn { font-size: 13px; }
 
 .fb-tree-scroll { flex: 1; overflow-y: auto; padding: 4px 0 8px; }
+
+/* ── Sidebar resize handle ───────────────────────────────── */
+.fb-resize-handle {
+  position: absolute;
+  top: 0;
+  right: -3px;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 10;
+  background: transparent;
+  transition: background 0.15s;
+}
+.fb-resize-handle:hover,
+.fb-resize-handle:active {
+  background: var(--accent);
+  opacity: 0.5;
+}
+
+/* Prevent text selection while dragging */
+body.sidebar-resizing {
+  user-select: none;
+  cursor: col-resize;
+}
 
 /* ── Tree nodes ──────────────────────────────────────────── */
 .tree-folder {

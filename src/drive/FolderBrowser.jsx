@@ -101,7 +101,7 @@ function TreeNode({ entry, depth, currentFileId, accessToken, onFilePicked, onNe
 
 // ── Folder browser shell ──────────────────────────────────────────────────────
 
-export default function FolderBrowser({ currentFileId, onFilePicked, onNewFileInFolder, isMobile, onClose }) {
+export default function FolderBrowser({ currentFileId, onFilePicked, onNewFileInFolder, isMobile, onClose, width, onResizeStart }) {
   const { accessToken } = useAuth()
   const [roots, setRoots] = useState(null)   // null = loading
   const [err, setErr]     = useState(null)
@@ -128,8 +128,10 @@ export default function FolderBrowser({ currentFileId, onFilePicked, onNewFileIn
     if (isMobile) onClose?.()
   }
 
+  const style = !isMobile && width ? { width } : undefined
+
   return (
-    <aside className={`folder-browser${isMobile ? ' mobile-drawer' : ''}`}>
+    <aside className={`folder-browser${isMobile ? ' mobile-drawer' : ''}`} style={style}>
       <div className="fb-tree-header">
         <span className="fb-tree-title">Files</span>
         <button className="fb-icon-btn" onClick={loadRoots} title="Refresh">↻</button>
@@ -153,6 +155,15 @@ export default function FolderBrowser({ currentFileId, onFilePicked, onNewFileIn
           />
         ))}
       </div>
+
+      {/* Desktop resize handle */}
+      {!isMobile && (
+        <div
+          className="fb-resize-handle"
+          onMouseDown={onResizeStart}
+          title="Drag to resize"
+        />
+      )}
     </aside>
   )
 }

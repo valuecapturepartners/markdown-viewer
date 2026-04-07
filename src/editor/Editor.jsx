@@ -120,6 +120,42 @@ export default function Editor({ onOpenCapture }) {
   const [showDiag, setShowDiag] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
   const [darkMode, setDarkMode] = useTheme()
+
+  // Sidebar resize
+  const SIDEBAR_MIN = 160
+  const SIDEBAR_MAX = 480
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    const saved = parseInt(localStorage.getItem('vcp_sidebar_w'), 10)
+    return saved > 0 ? saved : 220
+  })
+  const resizingRef = useRef(false)
+  const resizeStartRef = useRef({ x: 0, w: 0 })
+
+  const sidebarWidthRef = useRef(sidebarWidth)
+  useEffect(() => { sidebarWidthRef.current = sidebarWidth }, [sidebarWidth])
+
+  const handleResizeStart = useCallback((e) => {
+    e.preventDefault()
+    document.body.classList.add('sidebar-resizing')
+    resizingRef.current = true
+    resizeStartRef.current = { x: e.clientX, w: sidebarWidthRef.current }
+
+    const onMove = (ev) => {
+      if (!resizingRef.current) return
+      const delta = ev.clientX - resizeStartRef.current.x
+      const next = Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, resizeStartRef.current.w + delta))
+      setSidebarWidth(next)
+    }
+    const onUp = () => {
+      resizingRef.current = false
+      document.body.classList.remove('sidebar-resizing')
+      localStorage.setItem('vcp_sidebar_w', String(sidebarWidthRef.current))
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+    }
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+  }, [])
   const [isTracking, setIsTracking] = useState(false)
 
   // Reload last open file on mount
@@ -344,6 +380,8 @@ export default function Editor({ onOpenCapture }) {
               onFolderChange={setCurrentBrowseFolder}
               isMobile={isMobile}
               onClose={() => setSidebarOpen(false)}
+              width={isMobile ? undefined : sidebarWidth}
+              onResizeStart={isMobile ? undefined : handleResizeStart}
             />
           </>
         )}
