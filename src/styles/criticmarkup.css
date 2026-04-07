@@ -7,32 +7,34 @@
 
 /* ── Preview rendering — track ON ───────────────────────── */
 ins.critic-insertion {
-  background: var(--green-bg);
-  color: var(--green);
-  text-decoration: none;
-  border-bottom: 1px solid rgba(80, 200, 100, 0.4);
+  background: none;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--green);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
 }
 
-ins.critic-insertion[data-author]:not([data-author=""])::after {
-  content: ' @' attr(data-author);
-  font-size: 0.65em;
-  opacity: 0.6;
-  vertical-align: super;
-  pointer-events: none;
+ins.critic-insertion::before {
+  content: '·';
+  color: var(--green);
+  font-weight: 700;
+  margin-right: 1px;
 }
 
 del.critic-deletion {
-  background: var(--red-bg);
-  color: var(--red);
+  background: none;
+  color: var(--text-3);
   text-decoration: line-through;
+  text-decoration-color: var(--red);
+  text-decoration-thickness: 2px;
 }
 
-del.critic-deletion[data-author]:not([data-author=""])::after {
-  content: ' @' attr(data-author);
-  font-size: 0.65em;
-  opacity: 0.6;
-  vertical-align: super;
-  pointer-events: none;
+del.critic-deletion::before {
+  content: '·';
+  color: var(--red);
+  font-weight: 700;
+  margin-right: 1px;
 }
 
 mark.critic-highlight {

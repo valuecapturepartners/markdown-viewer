@@ -112,6 +112,13 @@ const TiptapPane = forwardRef(function TiptapPane(
 
   // Expose methods to Editor parent via ref
   useImperativeHandle(ref, () => ({
+    // Force content update regardless of focus state (used by accept/reject all)
+    forceContent: (md) => {
+      if (!editor) return
+      lastMd.current = md
+      baselineMd.current = md
+      editor.commands.setContent(markdownToHtml(md), false)
+    },
     // Insert CriticMarkup comment (called after dialog submit)
     insertComment: ({ author, date, text, selectedText }) => {
       if (!editor) return

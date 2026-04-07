@@ -230,6 +230,7 @@ export default function Editor({ onOpenCapture }) {
     const clean = acceptAll(content)
     setContent(clean)
     setIsTracking(false)
+    tiptapRef.current?.forceContent(clean)
     if (currentFile) {
       setIsSaving(true)
       setSaveStatus('Saving…')
@@ -250,6 +251,7 @@ export default function Editor({ onOpenCapture }) {
     const clean = rejectAll(content)
     setContent(clean)
     setIsTracking(false)
+    tiptapRef.current?.forceContent(clean)
     if (currentFile) {
       setIsSaving(true)
       setSaveStatus('Saving…')
