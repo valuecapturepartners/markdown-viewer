@@ -52,13 +52,23 @@ const TiptapPane = forwardRef(function TiptapPane(
     },
   })
 
+  // Set editor content without triggering track-changes (file loads, external syncs)
+  const setContentSafe = useCallback((md) => {
+    if (!editor) return
+    const ext = editor.extensionManager.extensions.find(e => e.name === 'trackChanges')
+    const prev = ext?.options.tracking
+    if (ext) ext.options.tracking = false
+    editor.commands.setContent(markdownToHtml(md), false)
+    if (ext) ext.options.tracking = prev
+  }, [editor])
+
   // Sync external content changes (e.g. file open, CodeMirror edits in split)
   useEffect(() => {
     if (!editor || editor.isFocused) return
     if (content === lastMd.current) return
     lastMd.current = content
-    editor.commands.setContent(markdownToHtml(content), false)
-  }, [content, editor])
+    setContentSafe(content)
+  }, [content, editor, setContentSafe])
 
   // Update editable when onChange presence changes
   useEffect(() => {
@@ -105,7 +115,7 @@ const TiptapPane = forwardRef(function TiptapPane(
     forceContent: (md) => {
       if (!editor) return
       lastMd.current = md
-      editor.commands.setContent(markdownToHtml(md), false)
+      setContentSafe(md)
     },
     // Insert CriticMarkup comment (called after dialog submit)
     insertComment: ({ author, date, text, selectedText }) => {
