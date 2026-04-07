@@ -9,16 +9,88 @@ import FolderBrowser from '../drive/FolderBrowser.jsx'
 import { readFile, saveFile } from '../drive/drive-api.js'
 import DiagnosticsPanel from '../debug/DiagnosticsPanel.jsx'
 
-const WELCOME = `# Welcome to VCP Markdown Editor
+const WELCOME = `# VCP Markdown Editor
 
-Open a file from Google Drive to get started, or start typing here.
+A mobile-first collaborative review editor backed by Google Drive.
 
-## CriticMarkup examples
+---
 
-- Insertion: {++ new text ++}
-- Deletion: {-- removed text --}
-- Highlight: {== important ==}
-- Comment: {>> @alice (2026-03-17): Review this section <<}
+## Getting started
+
+1. **Open a file** — tap ☰ to open the file browser, navigate your Drive or shared drives, and tap any \`.md\` file.
+2. **Edit** — the preview pane is your main editing surface. Tap anywhere to start writing.
+3. **Save** — edits are auto-saved 2 seconds after you stop typing. Tap **Save** in the header to save immediately. Use **Cmd/Ctrl + S** on desktop.
+
+---
+
+## Views
+
+| Button | Mode | Description |
+|--------|------|-------------|
+| Split | Side by side | Raw markdown on the left, rendered preview on the right |
+| Editor | Source only | Full-screen raw markdown (CodeMirror) |
+| Review | Preview only | Full-screen rendered preview — **primary editing surface** |
+
+On mobile the view switches to Review by default. Use the tab bar at the bottom to switch modes.
+
+---
+
+## Review & track changes
+
+### Inline markup (bubble menu)
+Select any text in the preview to reveal the floating toolbar:
+
+- **💬** — add a comment anchored to the selection
+- **H** — highlight the selection {== like this ==}
+- **+** — mark as insertion {++ like this ++}
+- **−** — mark as deletion {-- like this --}
+- **B / I** — bold / italic
+
+### Track changes mode
+Toggle **Track** in the toolbar (or the Track tab on mobile). While active, every edit you make is automatically wrapped in CriticMarkup when you finish a paragraph:
+
+- New words → {++ inserted ++}
+- Removed words → {-- deleted --}
+- Replaced words → {~~ old ~> new ~~}
+
+### Comments
+Tap **💬** in the toolbar or select text and tap 💬 in the bubble menu. Enter your handle and comment text. Comments are stored as {>> @handle (date): text <<} and shown as an inline badge.
+
+---
+
+## CriticMarkup reference
+
+\`\`\`
+{++ inserted text ++}
+{-- deleted text --}
+{== highlighted text ==}
+{~~ old text ~> new text ~~}
+{>> @handle (2026-04-07): comment text <<}
+\`\`\`
+
+---
+
+## File browser
+
+- Tap **☰** to toggle the sidebar
+- Tap **▸** next to a folder to expand it (lazy-loaded)
+- Tap a file name to open it
+- Tap **New** in the header to create a new \`.md\` file in the current folder
+- Shared drives appear alongside My Drive at the root level
+
+---
+
+## Keyboard shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| Cmd/Ctrl + S | Save |
+| Cmd/Ctrl + B | Bold |
+| Cmd/Ctrl + I | Italic |
+
+---
+
+*Powered by Tiptap · Google Drive API · CriticMarkup*
 `
 
 const LAST_FILE_KEY = 'vcp_last_file'
