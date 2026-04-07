@@ -72,10 +72,20 @@ export function criticMarkupPlugin() {
         html = applyCriticMarkup(html)
         return `<p>${html}</p>\n`
       },
+      heading({ tokens, depth }) {
+        let html = this.parser.parseInline(tokens)
+        html = applyCriticMarkup(html)
+        return `<h${depth}>${html}</h${depth}>\n`
+      },
       listitem({ tokens }) {
         let html = this.parser.parseInline(tokens)
         html = applyCriticMarkup(html)
         return `<li>${html}</li>\n`
+      },
+      tablecell({ tokens }) {
+        let html = this.parser.parseInline(tokens)
+        html = applyCriticMarkup(html)
+        return `<td>${html}</td>\n`
       },
     },
   }
