@@ -34,3 +34,19 @@
   color: #80e080;
   background: #1a2a1a;
 }
+
+.accept-btn {
+  color: var(--green);
+  font-weight: 600;
+}
+.accept-btn:hover {
+  background: #1a2a1a;
+}
+
+.reject-btn {
+  color: var(--red);
+  font-weight: 600;
+}
+.reject-btn:hover {
+  background: #2a1a1a;
+}

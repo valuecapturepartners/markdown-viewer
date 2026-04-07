@@ -32,29 +32,13 @@ export default function Toolbar({ editorRef, onComment, viewMode, onViewModeChan
       {!isMobile && (
         <>
           <span className="toolbar-divider" />
-          <div className="view-toggle" role="group" aria-label="View mode">
-            <button
-              className={`toolbar-btn ${viewMode === 'editor' ? 'active' : ''}`}
-              onClick={() => onViewModeChange('editor')}
-              title="Editor only"
-            >
-              Edit
-            </button>
-            <button
-              className={`toolbar-btn ${viewMode === 'split' ? 'active' : ''}`}
-              onClick={() => onViewModeChange('split')}
-              title="Split view"
-            >
-              Split
-            </button>
-            <button
-              className={`toolbar-btn ${viewMode === 'preview' ? 'active' : ''}`}
-              onClick={() => onViewModeChange('preview')}
-              title="Preview only"
-            >
-              Preview
-            </button>
-          </div>
+          <button
+            className={`toolbar-btn source-toggle ${viewMode !== 'preview' ? 'active' : ''}`}
+            onClick={() => onViewModeChange(viewMode === 'preview' ? 'split' : 'preview')}
+            title="Toggle source view"
+          >
+            Source
+          </button>
         </>
       )}
     </div>

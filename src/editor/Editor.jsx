@@ -8,6 +8,7 @@ import CommentDialog from './CommentDialog.jsx'
 import NewFileDialog from './NewFileDialog.jsx'
 import FolderBrowser from '../drive/FolderBrowser.jsx'
 import { readFile, saveFile } from '../drive/drive-api.js'
+import { hasCriticMarkup, acceptAll, rejectAll } from '../criticmarkup/syntax.js'
 import HelpPanel from './HelpPanel.jsx'
 
 const WELCOME = `# VCP Markdown Editor
@@ -111,7 +112,7 @@ export default function Editor({ onOpenCapture }) {
   const [saveStatus, setSaveStatus] = useState('')
   const [isCommentOpen, setIsCommentOpen] = useState(false)
   const [selectedText, setSelectedText] = useState('')
-  const [viewMode, setViewMode] = useState('split')
+  const [viewMode, setViewMode] = useState('preview')
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   const [isNewFileOpen, setIsNewFileOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
@@ -161,7 +162,7 @@ export default function Editor({ onOpenCapture }) {
     const stored = (() => { try { return JSON.parse(sessionStorage.getItem(LAST_FILE_KEY)) } catch { return null } })()
     if (stored?.id) {
       readFile(accessToken, stored.id)
-        .then(text => setContent(text))
+        .then(text => { setContent(text); setIsTracking(hasCriticMarkup(text)) })
         .catch(() => { setCurrentFile(null); sessionStorage.removeItem(LAST_FILE_KEY) })
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -199,6 +200,7 @@ export default function Editor({ onOpenCapture }) {
         const text = await readFile(accessToken, id)
         setContent(text)
         setCurrentFile({ id, name })
+        setIsTracking(hasCriticMarkup(text))
         sessionStorage.setItem(LAST_FILE_KEY, JSON.stringify({ id, name }))
         setSaveStatus('')
       } catch (err) {
@@ -223,6 +225,46 @@ export default function Editor({ onOpenCapture }) {
       setIsSaving(false)
     }
   }, [accessToken, currentFile, content])
+
+  const handleAcceptAll = useCallback(async () => {
+    const clean = acceptAll(content)
+    setContent(clean)
+    setIsTracking(false)
+    if (currentFile) {
+      setIsSaving(true)
+      setSaveStatus('Saving…')
+      try {
+        await saveFile(accessToken, currentFile.id, clean)
+        setSaveStatus('Saved')
+        setTimeout(() => setSaveStatus(''), 2000)
+      } catch (err) {
+        setSaveStatus('Save failed')
+        alert(`Failed to save: ${err.message}`)
+      } finally {
+        setIsSaving(false)
+      }
+    }
+  }, [content, currentFile, accessToken])
+
+  const handleRejectAll = useCallback(async () => {
+    const clean = rejectAll(content)
+    setContent(clean)
+    setIsTracking(false)
+    if (currentFile) {
+      setIsSaving(true)
+      setSaveStatus('Saving…')
+      try {
+        await saveFile(accessToken, currentFile.id, clean)
+        setSaveStatus('Saved')
+        setTimeout(() => setSaveStatus(''), 2000)
+      } catch (err) {
+        setSaveStatus('Save failed')
+        alert(`Failed to save: ${err.message}`)
+      } finally {
+        setIsSaving(false)
+      }
+    }
+  }, [content, currentFile, accessToken])
 
   const handleFileCreated = useCallback(async ({ id, name }) => {
     try {
@@ -316,6 +358,24 @@ export default function Editor({ onOpenCapture }) {
         </div>
 
         <div className="header-right">
+          {isTracking && hasCriticMarkup(content) && (
+            <>
+              <button
+                className="toolbar-btn accept-btn"
+                onClick={handleAcceptAll}
+                title="Accept all changes and save"
+              >
+                Accept all
+              </button>
+              <button
+                className="toolbar-btn reject-btn"
+                onClick={handleRejectAll}
+                title="Reject all changes and save"
+              >
+                Reject all
+              </button>
+            </>
+          )}
           {saveStatus && <span className="save-status">{saveStatus}</span>}
           {currentFile && (
             <button
@@ -400,37 +460,29 @@ export default function Editor({ onOpenCapture }) {
       {isMobile && (
         <nav className="mobile-tabs">
           <button
-            className={`tab-btn ${effectiveView === 'editor' ? 'active' : ''}`}
-            onClick={() => setViewMode('editor')}
-          >
-            Source
-          </button>
-          <button
             className={`tab-btn tab-btn-track ${isTracking ? 'active' : ''}`}
             onClick={() => setIsTracking(v => !v)}
-            title={isTracking ? 'Tracking changes — tap to disable' : 'Track changes'}
           >
             Track
           </button>
-          <button
-            className="tab-btn tab-btn-comment"
-            onClick={() => openCommentDialog()}
-            title="Add comment"
-          >
+          {isTracking && hasCriticMarkup(content) && (
+            <button className="tab-btn accept-btn" onClick={handleAcceptAll}>
+              Accept
+            </button>
+          )}
+          {isTracking && hasCriticMarkup(content) && (
+            <button className="tab-btn reject-btn" onClick={handleRejectAll}>
+              Reject
+            </button>
+          )}
+          <button className="tab-btn tab-btn-comment" onClick={() => openCommentDialog()}>
             Comment
           </button>
           <button
-            className={`tab-btn ${effectiveView === 'preview' ? 'active' : ''}`}
-            onClick={() => setViewMode('preview')}
+            className={`tab-btn ${viewMode === 'editor' ? 'active' : ''}`}
+            onClick={() => setViewMode(viewMode === 'editor' ? 'preview' : 'editor')}
           >
-            Review
-          </button>
-          <button
-            className="tab-btn"
-            onClick={() => setShowHelp(true)}
-            title="Help"
-          >
-            Help
+            Source
           </button>
         </nav>
       )}
