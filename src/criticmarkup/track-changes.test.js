@@ -3,7 +3,38 @@ import { applyTrackChanges } from './track-changes.js'
 
 // ─── helpers ─────────────────────────────────────────────────────────────────
 
-const tc = (before, after) => applyTrackChanges(before, after)
+const tc = (before, after, author, date) => applyTrackChanges(before, after, author, date)
+
+// ─── author attribution ───────────────────────────────────────────────────────
+
+describe('author attribution', () => {
+  it('appends {>> @handle (date): edit <<} when author provided', () => {
+    const r = tc('Hello world', 'Hello earth', 'mh', '2026-04-07')
+    expect(r).toContain('{>> @mh (2026-04-07): edit <<}')
+  })
+
+  it('prepends @ if missing', () => {
+    const r = tc('Hello world', 'Hello earth', 'ej', '2026-04-07')
+    expect(r).toContain('{>> @ej')
+  })
+
+  it('keeps @ if already present', () => {
+    const r = tc('Hello world', 'Hello earth', '@jnk', '2026-04-07')
+    expect(r).toContain('{>> @jnk')
+    expect(r).not.toContain('@@jnk')
+  })
+
+  it('no attribution when no author', () => {
+    const r = tc('Hello world', 'Hello earth')
+    expect(r).not.toContain('{>>')
+  })
+
+  it('no attribution when no changes', () => {
+    const r = tc('Hello world', 'Hello world', 'mh', '2026-04-07')
+    expect(r).toBe('Hello world')
+    expect(r).not.toContain('{>>')
+  })
+})
 
 // ─── no-op ───────────────────────────────────────────────────────────────────
 

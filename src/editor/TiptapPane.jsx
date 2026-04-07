@@ -31,7 +31,7 @@ const CRITIC_EXTENSIONS = [
 // ── Component ─────────────────────────────────────────────────────────────────
 
 const TiptapPane = forwardRef(function TiptapPane(
-  { content, onChange, onCommentRequest, tracking = false },
+  { content, onChange, onCommentRequest, tracking = false, author = '' },
   ref,
 ) {
   const lastMd   = useRef(content)    // tracks last markdown we set/got
@@ -71,7 +71,7 @@ const TiptapPane = forwardRef(function TiptapPane(
     if (!editor || !tracking || !onChange) return
     const handleBlur = () => {
       const current = lastMd.current
-      const tracked = applyTrackChanges(baselineMd.current, current)
+      const tracked = applyTrackChanges(baselineMd.current, current, author)
       if (tracked !== current) {
         lastMd.current = tracked
         onChange(tracked)

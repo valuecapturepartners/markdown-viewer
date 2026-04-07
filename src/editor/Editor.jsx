@@ -343,6 +343,7 @@ export default function Editor() {
                 onChange={effectiveView === 'split' || (isMobile && effectiveView === 'preview') ? setContent : undefined}
                 onCommentRequest={openCommentDialog}
                 tracking={isTracking}
+                author={userInfo?.email?.split('@')[0] || userInfo?.name?.split(' ').map(p => p[0].toLowerCase()).join('') || ''}
               />
             </div>
           )}

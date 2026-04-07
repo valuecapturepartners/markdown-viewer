@@ -123,8 +123,18 @@ function opsToMarkup(ops) {
 /**
  * Compare two markdown strings and return `after` annotated with CriticMarkup.
  * Existing CriticMarkup blocks in either string are never re-wrapped.
+ *
+ * @param {string} before  - original markdown
+ * @param {string} after   - edited markdown
+ * @param {string} [author] - handle of the editor, e.g. '@mh' or 'mh'
+ * @param {string} [date]   - ISO date string, defaults to today
  */
-export function applyTrackChanges(before, after) {
+export function applyTrackChanges(before, after, author, date) {
   if (before === after) return after
-  return opsToMarkup(mergeOps(diffTokens(tokenize(before), tokenize(after))))
+  const result = opsToMarkup(mergeOps(diffTokens(tokenize(before), tokenize(after))))
+  if (!author || result === after) return result
+  // Append a single attribution comment so reviewers know who made the changes
+  const h = author.startsWith('@') ? author : `@${author}`
+  const d = date || new Date().toISOString().split('T')[0]
+  return `${result}{>> ${h} (${d}): edit <<}`
 }
