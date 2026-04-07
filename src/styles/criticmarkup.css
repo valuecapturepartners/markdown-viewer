@@ -5,12 +5,20 @@
 .cm-critic-highlight  { background: rgba(255, 220, 50, 0.20); color: var(--yellow); }
 .cm-critic-comment    { background: var(--blue-bg); color: var(--blue); font-style: italic; }
 
-/* ── Preview rendering ───────────────────────────────────── */
+/* ── Preview rendering — track ON ───────────────────────── */
 ins.critic-insertion {
   background: var(--green-bg);
   color: var(--green);
   text-decoration: none;
   border-bottom: 1px solid rgba(80, 200, 100, 0.4);
+}
+
+ins.critic-insertion[data-author]:not([data-author=""])::after {
+  content: ' @' attr(data-author);
+  font-size: 0.65em;
+  opacity: 0.6;
+  vertical-align: super;
+  pointer-events: none;
 }
 
 del.critic-deletion {
@@ -19,12 +27,45 @@ del.critic-deletion {
   text-decoration: line-through;
 }
 
+del.critic-deletion[data-author]:not([data-author=""])::after {
+  content: ' @' attr(data-author);
+  font-size: 0.65em;
+  opacity: 0.6;
+  vertical-align: super;
+  pointer-events: none;
+}
+
 mark.critic-highlight {
   background: var(--yellow-bg);
   color: var(--yellow);
   padding: 0 1px;
   border-radius: 2px;
 }
+
+/* ── Track OFF: clean accepted view (hide all markup) ────── */
+.no-track ins.critic-insertion {
+  background: none;
+  color: inherit;
+  border-bottom: none;
+}
+.no-track ins.critic-insertion::after { display: none; }
+
+.no-track del.critic-deletion { display: none; }
+.no-track del.critic-deletion::after { display: none; }
+
+.no-track .critic-sub del.critic-deletion { display: none; }
+.no-track .critic-sub ins.critic-insertion {
+  background: none;
+  color: inherit;
+  border-bottom: none;
+}
+
+.no-track mark.critic-highlight {
+  background: none;
+  color: inherit;
+}
+
+.no-track .critic-comment { display: none; }
 
 .critic-comment {
   position: relative;

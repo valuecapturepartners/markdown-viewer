@@ -112,24 +112,27 @@ function deletedCriticToMarkup(token) {
 
 // Process a del op that contains CriticMarkup blocks.
 // Split on atomic CM blocks and handle each segment individually.
-function delWithCriticToMarkup(text) {
+function delWithCriticToMarkup(text, delFn) {
   const re = new RegExp(CM_BLOCK.source, 'g')
   let out = '', pos = 0, m
   while ((m = re.exec(text)) !== null) {
     if (m.index > pos) {
-      out += wrapCore(text.slice(pos, m.index), c => `{-- ${c} --}`)
+      out += wrapCore(text.slice(pos, m.index), delFn)
     }
     out += deletedCriticToMarkup(m[0])
     pos = m.index + m[0].length
   }
   if (pos < text.length) {
-    out += wrapCore(text.slice(pos), c => `{-- ${c} --}`)
+    out += wrapCore(text.slice(pos), delFn)
   }
   return out
 }
 
-// Build annotated markdown; del + ins fused into substitution where possible
-function opsToMarkup(ops) {
+// Build annotated markdown with optional author attribution
+function opsToMarkup(ops, authorPrefix = '') {
+  const ins = c => `{++ ${authorPrefix}${c} ++}`
+  const del = c => `{-- ${authorPrefix}${c} --}`
+
   let out = ''
   for (let i = 0; i < ops.length; i++) {
     const op   = ops[i]
@@ -143,23 +146,18 @@ function opsToMarkup(ops) {
       !hasCritic(op.v) && !hasCritic(next.v) &&
       !op.v.includes('~~') && !next.v.includes('~~')
     ) {
-      // Substitution: {~~ old ~> new ~~}  (old = del, new = ins)
-      const oldCore = op.v.trim()
-      const newCore = next.v.trim()
-      const space   = op.v.match(/^(\s*)/)[1]   // preserve leading space from context
-      out += oldCore && newCore
-        ? space + `{~~ ${oldCore} ~> ${newCore} ~~}`
-        : wrapCore(op.v, c => `{-- ${c} --}`) + wrapCore(next.v, c => `{++ ${c} ++}`)
+      // Adjacent del+ins: emit as separate marks (avoids ~~ conflicts in substitutions)
+      out += wrapCore(op.v, del) + wrapCore(next.v, ins)
       i++
 
     } else if (op.type === 'ins' && !hasCritic(op.v)) {
-      out += wrapCore(op.v, c => `{++ ${c} ++}`)
+      out += wrapCore(op.v, ins)
 
     } else if (op.type === 'del') {
       // Deletion — may or may not contain CriticMarkup blocks
       out += hasCritic(op.v)
-        ? delWithCriticToMarkup(op.v)
-        : wrapCore(op.v, c => `{-- ${c} --}`)
+        ? delWithCriticToMarkup(op.v, del)
+        : wrapCore(op.v, del)
 
     } else {
       out += op.v  // ins containing CriticMarkup — pass through
@@ -176,8 +174,10 @@ function opsToMarkup(ops) {
  *
  * @param {string} before  - original markdown
  * @param {string} after   - edited markdown
+ * @param {string} author  - optional author handle (without @), e.g. 'max'
  */
-export function applyTrackChanges(before, after) {
+export function applyTrackChanges(before, after, author = '') {
   if (before === after) return after
-  return opsToMarkup(mergeOps(diffTokens(tokenize(before), tokenize(after))))
+  const authorPrefix = author ? `@${author}: ` : ''
+  return opsToMarkup(mergeOps(diffTokens(tokenize(before), tokenize(after))), authorPrefix)
 }

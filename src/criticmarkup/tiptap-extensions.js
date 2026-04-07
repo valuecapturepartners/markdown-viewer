@@ -3,6 +3,13 @@ import { Mark, Node, mergeAttributes } from '@tiptap/core'
 // ── Insertion  {++ text ++} ───────────────────────────────────────────────────
 export const CriticInsertion = Mark.create({
   name: 'criticInsertion',
+  addAttributes: () => ({
+    author: {
+      default: '',
+      parseHTML: el => el.getAttribute('data-author') || '',
+      renderHTML: attrs => attrs.author ? { 'data-author': attrs.author } : {},
+    },
+  }),
   renderHTML: ({ HTMLAttributes }) =>
     ['ins', mergeAttributes({ class: 'critic-insertion' }, HTMLAttributes), 0],
   parseHTML: () => [{ tag: 'ins.critic-insertion' }],
@@ -11,6 +18,13 @@ export const CriticInsertion = Mark.create({
 // ── Deletion  {-- text --} ────────────────────────────────────────────────────
 export const CriticDeletion = Mark.create({
   name: 'criticDeletion',
+  addAttributes: () => ({
+    author: {
+      default: '',
+      parseHTML: el => el.getAttribute('data-author') || '',
+      renderHTML: attrs => attrs.author ? { 'data-author': attrs.author } : {},
+    },
+  }),
   renderHTML: ({ HTMLAttributes }) =>
     ['del', mergeAttributes({ class: 'critic-deletion' }, HTMLAttributes), 0],
   parseHTML: () => [{ tag: 'del.critic-deletion' }],

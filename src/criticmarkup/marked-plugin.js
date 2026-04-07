@@ -17,16 +17,26 @@ function applyCriticMarkup(html) {
     },
   )
 
-  // 2. Insertion  {++ text ++}
+  // 2. Insertion  {++ text ++}  or  {++ @author: text ++}
   html = html.replace(
     /\{\+\+([\s\S]*?)\+\+\}/g,
-    (m, inner) => `<ins class="critic-insertion">${inner}</ins>`,
+    (m, inner) => {
+      const authorMatch = inner.match(/^@([\w.]+):\s*/)
+      const author  = authorMatch ? authorMatch[1] : ''
+      const content = authorMatch ? inner.slice(authorMatch[0].length) : inner
+      return `<ins class="critic-insertion" data-author="${author}">${content}</ins>`
+    },
   )
 
-  // 3. Deletion  {-- text --}
+  // 3. Deletion  {-- text --}  or  {-- @author: text --}
   html = html.replace(
     /\{--([\s\S]*?)--\}/g,
-    (m, inner) => `<del class="critic-deletion">${inner}</del>`,
+    (m, inner) => {
+      const authorMatch = inner.match(/^@([\w.]+):\s*/)
+      const author  = authorMatch ? authorMatch[1] : ''
+      const content = authorMatch ? inner.slice(authorMatch[0].length) : inner
+      return `<del class="critic-deletion" data-author="${author}">${content}</del>`
+    },
   )
 
   // 4. Highlight  {== text ==}

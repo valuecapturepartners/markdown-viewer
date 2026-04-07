@@ -7,8 +7,14 @@ function applyMark(mark, text) {
     case 'italic':          return `_${text}_`
     case 'code':            return `\`${text}\``
     case 'strike':          return `~~${text}~~`
-    case 'criticInsertion': return `{++ ${text} ++}`
-    case 'criticDeletion':  return `{-- ${text} --}`
+    case 'criticInsertion': {
+      const a = mark.attrs?.author
+      return `{++ ${a ? `@${a}: ` : ''}${text} ++}`
+    }
+    case 'criticDeletion': {
+      const a = mark.attrs?.author
+      return `{-- ${a ? `@${a}: ` : ''}${text} --}`
+    }
     case 'criticHighlight': return `{== ${text} ==}`
     default:                return text
   }

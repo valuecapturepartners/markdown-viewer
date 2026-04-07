@@ -74,7 +74,7 @@ const TiptapPane = forwardRef(function TiptapPane(
     baselineMd.current = lastMd.current
     const handleBlur = () => {
       const current = lastMd.current
-      const tracked = applyTrackChanges(baselineMd.current, current)
+      const tracked = applyTrackChanges(baselineMd.current, current, author)
       if (tracked !== current) {
         lastMd.current = tracked
         onChange(tracked)
@@ -156,7 +156,7 @@ const TiptapPane = forwardRef(function TiptapPane(
   const isActive = (name) => editor?.isActive(name)
 
   return (
-    <div className="tiptap-wrap">
+    <div className={`tiptap-wrap${tracking ? '' : ' no-track'}`}>
       {editor && isEditable && (
         <BubbleMenu
           editor={editor}
