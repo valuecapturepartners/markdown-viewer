@@ -316,7 +316,7 @@ export default function Editor({ onOpenCapture }) {
       {/* Header */}
       <header className="editor-header">
         <div className="header-left">
-          <span className="app-title">VCP MD</span>
+          <span className="app-title desktop-only">VCP MD</span>
           <button
             className={`toolbar-btn sidebar-toggle ${sidebarOpen ? 'active' : ''}`}
             onClick={() => setSidebarOpen((v) => !v)}
@@ -326,7 +326,7 @@ export default function Editor({ onOpenCapture }) {
           </button>
           {onOpenCapture && (
             <button
-              className="toolbar-btn"
+              className="toolbar-btn desktop-only"
               onClick={onOpenCapture}
               title="Go to Capture / Dump screen"
             >
@@ -334,7 +334,7 @@ export default function Editor({ onOpenCapture }) {
             </button>
           )}
           <button
-            className="toolbar-btn"
+            className="toolbar-btn desktop-only"
             onClick={() => setIsNewFileOpen(true)}
             title="New file"
           >
@@ -360,6 +360,22 @@ export default function Editor({ onOpenCapture }) {
         </div>
 
         <div className="header-right">
+          {/* Mobile-only: Track + Comment in header */}
+          <button
+            className={`toolbar-btn mobile-only ${isTracking ? 'active tracking-active' : ''}`}
+            onClick={() => setIsTracking(v => !v)}
+            title={isTracking ? 'Tracking on' : 'Track changes'}
+          >
+            Track
+          </button>
+          <button
+            className="toolbar-btn comment-btn mobile-only"
+            onClick={() => openCommentDialog()}
+            title="Add comment"
+          >
+            Comment
+          </button>
+
           {isTracking && hasCriticMarkup(content) && (
             <>
               <button
@@ -367,14 +383,14 @@ export default function Editor({ onOpenCapture }) {
                 onClick={handleAcceptAll}
                 title="Accept all changes and save"
               >
-                Accept all
+                Accept
               </button>
               <button
                 className="toolbar-btn reject-btn"
                 onClick={handleRejectAll}
                 title="Reject all changes and save"
               >
-                Reject all
+                Reject
               </button>
             </>
           )}
@@ -392,21 +408,21 @@ export default function Editor({ onOpenCapture }) {
             <img
               src={userInfo.picture}
               alt={userInfo.name}
-              className="user-avatar"
+              className="user-avatar desktop-only"
               title={userInfo.name}
             />
           )}
           <button
-            className="toolbar-btn theme-btn"
+            className="toolbar-btn theme-btn desktop-only"
             onClick={() => setDarkMode(d => !d)}
             title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
           >
             {darkMode ? 'Light' : 'Dark'}
           </button>
-          <button className="toolbar-btn" onClick={() => setShowHelp(true)} title="Help">
+          <button className="toolbar-btn desktop-only" onClick={() => setShowHelp(true)} title="Help">
             Help
           </button>
-          <button className="toolbar-btn" onClick={signOut}>
+          <button className="toolbar-btn desktop-only" onClick={signOut}>
             Sign out
           </button>
         </div>
@@ -457,37 +473,6 @@ export default function Editor({ onOpenCapture }) {
           )}
         </div>
       </div>
-
-      {/* Mobile tab bar */}
-      {isMobile && (
-        <nav className="mobile-tabs">
-          <button
-            className={`tab-btn tab-btn-track ${isTracking ? 'active' : ''}`}
-            onClick={() => setIsTracking(v => !v)}
-          >
-            Track
-          </button>
-          {isTracking && hasCriticMarkup(content) && (
-            <button className="tab-btn accept-btn" onClick={handleAcceptAll}>
-              Accept
-            </button>
-          )}
-          {isTracking && hasCriticMarkup(content) && (
-            <button className="tab-btn reject-btn" onClick={handleRejectAll}>
-              Reject
-            </button>
-          )}
-          <button className="tab-btn tab-btn-comment" onClick={() => openCommentDialog()}>
-            Comment
-          </button>
-          <button
-            className={`tab-btn ${viewMode === 'editor' ? 'active' : ''}`}
-            onClick={() => setViewMode(viewMode === 'editor' ? 'preview' : 'editor')}
-          >
-            Source
-          </button>
-        </nav>
-      )}
 
       {/* Comment dialog */}
       {isCommentOpen && (

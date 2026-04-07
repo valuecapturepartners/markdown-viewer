@@ -1,18 +1,26 @@
 @media (max-width: 767px) {
-  /* Header: tighten up */
+  .desktop-only { display: none !important; }
+
+  /* Header: minimal — Files · filename · actions · Save */
   .editor-header {
     padding: 0 8px;
     height: 48px;
     flex-wrap: nowrap;
     overflow: hidden;
+    gap: 4px;
   }
 
-  .app-title { font-size: 13px; }
-  .file-name { max-width: 110px; font-size: 12px; }
-
-  /* Hide non-essential header items on mobile */
+  .file-name { max-width: 100px; font-size: 12px; }
   .header-center { display: none; }
-  .user-avatar { width: 22px; height: 22px; }
+
+  /* Compact action buttons in mobile header */
+  .header-right {
+    gap: 3px;
+  }
+  .header-right .toolbar-btn {
+    font-size: 12px;
+    padding: 4px 7px;
+  }
 
   /* Full-width panes */
   .editor-body {
@@ -26,54 +34,6 @@
     overflow: hidden;
   }
 
-  /* Mobile tab bar — 3 buttons, safe area aware */
-  .mobile-tabs {
-    display: flex;
-    height: 52px;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-    flex-shrink: 0;
-    background: var(--bg-2);
-    border-top: 1px solid #333;
-  }
-
-  .tab-btn {
-    flex: 1;
-    background: transparent;
-    border: none;
-    color: var(--text-3);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: color 0.15s;
-    min-height: 44px;
-  }
-
-  .tab-btn.active {
-    color: #fff;
-    border-bottom: 2px solid #4285F4;
-  }
-
-  /* Track + Comment buttons in tab bar — narrower */
-  .tab-btn-track {
-    flex: 0 0 64px;
-    font-size: 11px;
-    font-weight: 600;
-    border-left: 1px solid #333;
-    color: var(--text-3);
-    letter-spacing: 0.2px;
-  }
-  .tab-btn-track.active {
-    color: var(--red);
-    border-bottom: 2px solid var(--red);
-  }
-  .tab-btn-comment {
-    flex: 0 0 44px;
-    font-size: 18px;
-    border-left: 1px solid #333;
-    border-right: 1px solid #333;
-    color: var(--blue);
-  }
-
   /* Dialog: full width on small screens */
   .dialog {
     width: 96vw;
@@ -83,10 +43,9 @@
   /* Preview: comfortable reading/editing */
   .preview-content {
     padding: 16px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
     font-size: 15px;
     line-height: 1.7;
-    /* Keep content above tab bar */
-    padding-bottom: calc(16px + 52px + env(safe-area-inset-bottom, 0px));
   }
 
   /* Bigger touch targets for floating toolbar on mobile */
@@ -124,4 +83,5 @@
 /* Desktop: hide mobile-only elements */
 @media (min-width: 768px) {
   .mobile-tabs { display: none; }
+  .mobile-only { display: none !important; }
 }
