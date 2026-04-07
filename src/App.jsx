@@ -6,7 +6,7 @@ import CaptureScreen from './capture/CaptureScreen.jsx'
 
 function AppInner() {
   const { accessToken } = useAuth()
-  const [screen, setScreen] = useState('capture') // 'capture' | 'editor'
+  const [screen, setScreen] = useState('editor') // 'capture' | 'editor'
 
   if (!accessToken) return <GoogleAuth />
 

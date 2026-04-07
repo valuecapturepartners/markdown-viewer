@@ -15,7 +15,7 @@
   height: 48px;
   flex-shrink: 0;
   background: var(--bg-2);
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border);
 }
 
 .capture-user {
@@ -26,7 +26,7 @@
 
 .capture-username {
   font-size: 13px;
-  color: var(--text-4);
+  color: var(--text-3);
 }
 
 .capture-body {
@@ -42,18 +42,18 @@
 }
 
 .capture-warning {
-  background: #2a1f00;
-  border: 1px solid #554400;
+  background: var(--yellow-bg);
+  border: 1px solid var(--yellow);
   border-radius: 6px;
-  color: #f0c040;
+  color: var(--yellow);
   font-size: 13px;
   padding: 10px 14px;
 }
 
 /* ── Textarea ────────────────────────────────────────────── */
 .capture-textarea {
-  background: var(--bg-2);
-  border: 1px solid #3a3a3a;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text);
   font-size: 15px;
@@ -67,18 +67,18 @@
   transition: border-color 0.15s;
 }
 .capture-textarea:focus {
-  border-color: var(--text-4);
+  border-color: var(--accent);
 }
 .capture-textarea::placeholder {
-  color: var(--text-4);
+  color: var(--text-placeholder);
 }
 
 /* ── Gemini button ───────────────────────────────────────── */
 .gemini-btn {
-  background: linear-gradient(135deg, #1a3a5c, #2a1a5c);
-  border: 1px solid #3a4a7a;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent);
   border-radius: 8px;
-  color: #a8c5e8;
+  color: var(--accent);
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
@@ -87,8 +87,8 @@
   width: 100%;
 }
 .gemini-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #1e4a6e, #341a6e);
-  color: #c0d8f0;
+  background: var(--blue-bg);
+  color: var(--blue);
 }
 .gemini-btn:disabled {
   opacity: 0.4;
@@ -104,7 +104,7 @@
 /* ── Dividers and sections ───────────────────────────────── */
 .capture-divider {
   border: none;
-  border-top: 1px solid #2e2e2e;
+  border-top: 1px solid var(--border);
   margin: 0;
 }
 
@@ -119,7 +119,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.6px;
-  color: var(--text-4);
+  color: var(--text-3);
 }
 
 /* ── Context chips ───────────────────────────────────────── */
@@ -131,19 +131,23 @@
 
 .chip {
   background: var(--bg-3);
-  border: 1px solid #3a3a3a;
+  border: 1px solid var(--border);
   border-radius: 20px;
-  color: var(--text-4);
+  color: var(--text-2);
   cursor: pointer;
   font-size: 13px;
   padding: 5px 14px;
   transition: background 0.1s, color 0.1s, border-color 0.1s;
 }
-.chip:hover { background: var(--border); color: var(--text-2); border-color: var(--text-4); }
+.chip:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+  border-color: var(--border-2);
+}
 .chip.active {
-  background: #1e3a5f;
-  border-color: #4285F4;
-  color: var(--blue);
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 /* ── Type toggle ─────────────────────────────────────────── */
@@ -154,26 +158,29 @@
 
 .toggle-btn {
   background: var(--bg-3);
-  border: 1px solid #3a3a3a;
+  border: 1px solid var(--border);
   border-radius: 6px;
-  color: var(--text-4);
+  color: var(--text-2);
   cursor: pointer;
   flex: 1;
   font-size: 13px;
   padding: 8px 12px;
   transition: background 0.1s, color 0.1s, border-color 0.1s;
 }
-.toggle-btn:hover { background: var(--border); color: var(--text-2); }
+.toggle-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
 .toggle-btn.active {
-  background: #1e3a5f;
-  border-color: #4285F4;
-  color: var(--blue);
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 /* ── Task title input ────────────────────────────────────── */
 .task-title-input {
-  background: var(--bg-2);
-  border: 1px solid #3a3a3a;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
   border-radius: 6px;
   color: var(--text);
   font-size: 14px;
@@ -182,13 +189,13 @@
   width: 100%;
   transition: border-color 0.15s;
 }
-.task-title-input:focus { border-color: var(--text-4); }
-.task-title-input::placeholder { color: var(--text-4); }
+.task-title-input:focus { border-color: var(--accent); }
+.task-title-input::placeholder { color: var(--text-placeholder); }
 
 /* ── Save button ─────────────────────────────────────────── */
 .save-inbox-btn {
-  background: #1a5c2a;
-  border: 1px solid #2a8a3a;
+  background: var(--green-bg);
+  border: 1px solid var(--green-border);
   border-radius: 8px;
   color: var(--green);
   cursor: pointer;
@@ -199,8 +206,7 @@
   width: 100%;
 }
 .save-inbox-btn:hover:not(:disabled) {
-  background: #1f6e32;
-  color: #80e090;
+  filter: brightness(0.9);
 }
 .save-inbox-btn:disabled {
   opacity: 0.4;
@@ -222,9 +228,9 @@
 
 .capture-action-btn {
   background: var(--bg-2);
-  border: 1px solid #3a3a3a;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  color: var(--text-4);
+  color: var(--text-2);
   cursor: pointer;
   flex: 1;
   font-size: 14px;
@@ -232,9 +238,9 @@
   transition: background 0.1s, color 0.1s;
 }
 .capture-action-btn:hover {
-  background: var(--border);
-  color: var(--text-2);
-  border-color: var(--text-4);
+  background: var(--bg-hover);
+  color: var(--text);
+  border-color: var(--border-2);
 }
 
 /* ── Mobile adjustments ─────────────────────────────────── */
