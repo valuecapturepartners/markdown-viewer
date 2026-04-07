@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { marked } from 'marked'
 import TurndownService from 'turndown'
 import { criticMarkupPlugin } from '../criticmarkup/marked-plugin.js'
+import { applyTrackChanges } from '../criticmarkup/track-changes.js'
 
 marked.use(criticMarkupPlugin())
 
@@ -13,9 +14,10 @@ td.addRule('criticmarkup', {
 
 const BAR_WIDTH = 260
 
-export default function PreviewPane({ content, onChange, onCommentRequest }) {
+export default function PreviewPane({ content, onChange, onCommentRequest, tracking = false }) {
   const ref = useRef(null)
   const isFocused = useRef(false)
+  const contentAtFocus = useRef('')
   const [floatingBar, setFloatingBar] = useState(null) // { rect, text }
   const [tapComment, setTapComment] = useState(null)   // { author, date, text, x, y }
 
@@ -93,7 +95,12 @@ export default function PreviewPane({ content, onChange, onCommentRequest }) {
   const handleBlur = () => {
     isFocused.current = false
     if (!onChange || !ref.current) return
-    onChange(td.turndown(ref.current.innerHTML))
+    const newMarkdown = td.turndown(ref.current.innerHTML)
+    if (tracking && contentAtFocus.current !== newMarkdown) {
+      onChange(applyTrackChanges(contentAtFocus.current, newMarkdown))
+    } else {
+      onChange(newMarkdown)
+    }
   }
 
   // Position floating bar above selection, clamped to viewport
@@ -112,7 +119,7 @@ export default function PreviewPane({ content, onChange, onCommentRequest }) {
         className="preview-content"
         contentEditable={!!onChange}
         suppressContentEditableWarning
-        onFocus={() => { isFocused.current = true }}
+        onFocus={() => { isFocused.current = true; contentAtFocus.current = content }}
         onBlur={handleBlur}
       />
 

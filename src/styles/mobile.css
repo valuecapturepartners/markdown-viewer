@@ -53,9 +53,21 @@
     border-bottom: 2px solid #4285F4;
   }
 
-  /* Comment button in tab bar — narrower, always highlighted */
+  /* Track + Comment buttons in tab bar — narrower */
+  .tab-btn-track {
+    flex: 0 0 64px;
+    font-size: 11px;
+    font-weight: 600;
+    border-left: 1px solid #333;
+    color: #888;
+    letter-spacing: 0.2px;
+  }
+  .tab-btn-track.active {
+    color: #e07070;
+    border-bottom: 2px solid #e07070;
+  }
   .tab-btn-comment {
-    flex: 0 0 52px;
+    flex: 0 0 44px;
     font-size: 18px;
     border-left: 1px solid #333;
     border-right: 1px solid #333;

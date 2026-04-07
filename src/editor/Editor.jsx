@@ -41,6 +41,7 @@ export default function Editor() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [currentBrowseFolder, setCurrentBrowseFolder] = useState(null)
   const [showDiag, setShowDiag] = useState(false)
+  const [isTracking, setIsTracking] = useState(false)
 
   // Reload last open file on mount
   useEffect(() => {
@@ -170,6 +171,8 @@ export default function Editor() {
             viewMode={viewMode}
             onViewModeChange={setViewMode}
             isMobile={isMobile}
+            isTracking={isTracking}
+            onTrackingChange={setIsTracking}
           />
         </div>
 
@@ -239,6 +242,7 @@ export default function Editor() {
                 content={content}
                 onChange={effectiveView === 'split' || (isMobile && effectiveView === 'preview') ? setContent : undefined}
                 onCommentRequest={openCommentDialog}
+                tracking={isTracking}
               />
             </div>
           )}
@@ -253,6 +257,13 @@ export default function Editor() {
             onClick={() => setViewMode('editor')}
           >
             Source
+          </button>
+          <button
+            className={`tab-btn tab-btn-track ${isTracking ? 'active' : ''}`}
+            onClick={() => setIsTracking(v => !v)}
+            title={isTracking ? 'Tracking changes — tap to disable' : 'Track changes'}
+          >
+            {isTracking ? '⏺ Track' : 'Track'}
           </button>
           <button
             className="tab-btn tab-btn-comment"

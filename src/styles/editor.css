@@ -675,6 +675,12 @@ html, body, #root {
 
 .fb-shared-drive .fb-icon { filter: none; }
 
+/* ── Track changes ───────────────────────────────────────── */
+.tracking-active {
+  color: #e07070 !important;
+  border-color: rgba(220, 80, 80, 0.4) !important;
+}
+
 /* ── Preview floating toolbar ────────────────────────────── */
 .preview-floating-bar {
   position: fixed;

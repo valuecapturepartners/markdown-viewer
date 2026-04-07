@@ -1,4 +1,4 @@
-export default function Toolbar({ editorRef, onComment, viewMode, onViewModeChange, isMobile }) {
+export default function Toolbar({ editorRef, onComment, viewMode, onViewModeChange, isMobile, isTracking, onTrackingChange }) {
   const wrap = (before, after) => editorRef?.current?.wrapSelection(before, after)
 
   return (
@@ -20,6 +20,13 @@ export default function Toolbar({ editorRef, onComment, viewMode, onViewModeChan
 
       <button className="toolbar-btn comment-btn" onClick={onComment} title="Add comment">
         Comment
+      </button>
+      <button
+        className={`toolbar-btn ${isTracking ? 'active tracking-active' : ''}`}
+        onClick={() => onTrackingChange?.(!isTracking)}
+        title={isTracking ? 'Tracking changes (click to disable)' : 'Track changes'}
+      >
+        {isTracking ? '⏺ Track' : 'Track'}
       </button>
 
       {!isMobile && (
