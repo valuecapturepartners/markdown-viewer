@@ -5,6 +5,7 @@ import {
   forwardRef,
   useState,
   useCallback,
+  useMemo,
 } from "react";
 import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -30,42 +31,42 @@ function extractFrontmatter(md) {
   const m = md.match(FRONTMATTER_RE);
   if (!m) return { body: md, frontmatter: null };
   const fields = [];
-  for (const line of m[1].split("\n")) {
+  const lines = m[1].split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    // Skip indented continuation lines (handled below with their parent)
+    if (/^\s/.test(line) && fields.length) continue;
     const colon = line.indexOf(":");
-    if (colon > 0) {
-      const key = line.slice(0, colon).trim();
-      let val = line.slice(colon + 1).trim();
-      // Strip surrounding quotes
-      if (
-        (val.startsWith('"') && val.endsWith('"')) ||
-        (val.startsWith("'") && val.endsWith("'"))
-      ) {
-        val = val.slice(1, -1);
-      }
-      fields.push({ key, value: val });
+    if (colon <= 0) continue;
+    const key = line.slice(0, colon).trim();
+    let val = line.slice(colon + 1).trim();
+    // Strip surrounding quotes
+    if (
+      (val.startsWith('"') && val.endsWith('"')) ||
+      (val.startsWith("'") && val.endsWith("'"))
+    ) {
+      val = val.slice(1, -1);
     }
+    // Collect indented continuation lines (nested YAML values)
+    if (!val) {
+      const nested = [];
+      while (i + 1 < lines.length && /^\s/.test(lines[i + 1])) {
+        i++;
+        nested.push(lines[i].trim());
+      }
+      val = nested.join(", ");
+    }
+    fields.push({ key, value: val });
   }
   const body = md.slice(m[0].length);
   return { body, frontmatter: fields.length ? fields : null };
 }
 
-/** Render frontmatter fields as an Obsidian-style properties table */
-function frontmatterToHtml(fields) {
-  const rows = fields
-    .map(
-      ({ key, value }) =>
-        `<tr><td class="fm-key">${key}</td><td class="fm-val">${value || '<span class="fm-empty">—</span>'}</td></tr>`,
-    )
-    .join("");
-  return `<div class="frontmatter-table" contenteditable="false"><table><tbody>${rows}</tbody></table></div>`;
-}
-
-// Convert markdown → HTML for Tiptap input
+// Convert markdown → HTML for Tiptap input (frontmatter stripped, rendered separately)
 function markdownToHtml(md) {
   try {
-    const { body, frontmatter } = extractFrontmatter(md);
-    const html = marked.parse(body);
-    return frontmatter ? frontmatterToHtml(frontmatter) + html : html;
+    const { body } = extractFrontmatter(md);
+    return marked.parse(body);
   } catch {
     return `<p>${md}</p>`;
   }
@@ -95,6 +96,11 @@ const TiptapPane = forwardRef(function TiptapPane(
   const [tapComment, setTapComment] = useState(null);
   // Store raw frontmatter block so we can prepend it back on serialization
   const frontmatterRef = useRef(extractRawFrontmatter(content));
+  // Extract frontmatter fields for rendering as a React component
+  const frontmatterFields = useMemo(
+    () => extractFrontmatter(content).frontmatter,
+    [content],
+  );
 
   const editor = useEditor({
     extensions: [
@@ -313,7 +319,25 @@ const TiptapPane = forwardRef(function TiptapPane(
         </BubbleMenu>
       )}
 
-      <EditorContent editor={editor} className="tiptap-content" />
+      <div className="tiptap-content">
+        {frontmatterFields && (
+          <div className="frontmatter-table">
+            <table>
+              <tbody>
+                {frontmatterFields.map(({ key, value }, i) => (
+                  <tr key={i}>
+                    <td className="fm-key">{key}</td>
+                    <td className="fm-val">
+                      {value || <span className="fm-empty">—</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        <EditorContent editor={editor} />
+      </div>
 
       {tapComment && (
         <div

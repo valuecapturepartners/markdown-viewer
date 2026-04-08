@@ -172,13 +172,10 @@
 }
 
 /* ── Frontmatter properties table (Obsidian-style) ─────── */
-.frontmatter-table {
-  background: var(--bg-2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  margin-bottom: 1.5em;
-  overflow: hidden;
-  user-select: text;
+.tiptap-content .frontmatter-table {
+  max-width: 760px;
+  margin: 24px auto 0;
+  padding: 0 28px;
 }
 
 .frontmatter-table table {
@@ -186,6 +183,10 @@
   border-collapse: collapse;
   font-size: 13px;
   margin: 0;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 .frontmatter-table tr:not(:last-child) td {
@@ -195,7 +196,6 @@
 .frontmatter-table td {
   padding: 7px 12px;
   vertical-align: top;
-  border: none;
 }
 
 .frontmatter-table .fm-key {
