@@ -125,6 +125,9 @@ export default function Editor({ onOpenCapture, onOpenKanban }) {
   const [isNewFileOpen, setIsNewFileOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [currentBrowseFolder, setCurrentBrowseFolder] = useState(null);
+  const [refreshTarget, setRefreshTarget] = useState(null);
+  const currentBrowseFolderRef = useRef(null);
+  useEffect(() => { currentBrowseFolderRef.current = currentBrowseFolder; }, [currentBrowseFolder]);
   const [showHelp, setShowHelp] = useState(false);
   const [darkMode, setDarkMode] = useTheme();
 
@@ -304,6 +307,11 @@ export default function Editor({ onOpenCapture, onOpenKanban }) {
       setCurrentFile({ id, name });
       sessionStorage.setItem(LAST_FILE_KEY, JSON.stringify({ id, name }));
       setSaveStatus("");
+      // Refresh the parent folder in the tree so the new file appears
+      const folder = currentBrowseFolderRef.current;
+      if (folder?.id) {
+        setRefreshTarget({ id: folder.id, key: Date.now() });
+      }
     },
     [accessToken],
   );
@@ -376,8 +384,11 @@ export default function Editor({ onOpenCapture, onOpenKanban }) {
           )}
           <button
             className="toolbar-btn desktop-only"
-            onClick={() => setIsNewFileOpen(true)}
-            title="New file"
+            onClick={() => {
+              if (currentBrowseFolder) setCurrentBrowseFolder(currentBrowseFolder);
+              setIsNewFileOpen(true);
+            }}
+            title="New file in current folder"
           >
             New
           </button>
@@ -486,8 +497,12 @@ export default function Editor({ onOpenCapture, onOpenKanban }) {
             <FolderBrowser
               currentFileId={currentFile?.id}
               onFilePicked={handleFilePicked}
-              onNewFileInFolder={() => setIsNewFileOpen(true)}
+              onNewFileInFolder={(folder) => {
+                if (folder) setCurrentBrowseFolder(folder);
+                setIsNewFileOpen(true);
+              }}
               onFolderChange={setCurrentBrowseFolder}
+              refreshTarget={refreshTarget}
               isMobile={isMobile}
               onClose={() => setSidebarOpen(false)}
               width={isMobile ? undefined : sidebarWidth}

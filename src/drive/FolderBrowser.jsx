@@ -11,26 +11,38 @@ function formatDate(iso) {
 
 // ── Single tree node (folder or file) ────────────────────────────────────────
 
-function TreeNode({ entry, depth, currentFileId, accessToken, onFilePicked, onNewFile }) {
+function TreeNode({ entry, depth, currentFileId, accessToken, onFilePicked, onNewFile, onFolderChange, refreshTarget }) {
   const isFolder = entry.mimeType === FOLDER_MIME || entry._isFolder
   const [open, setOpen] = useState(false)
   const [children, setChildren] = useState(null) // null = not loaded yet
   const [loading, setLoading] = useState(false)
   const [err, setErr] = useState(null)
 
+  const loadChildren = useCallback(async () => {
+    setLoading(true)
+    setErr(null)
+    try {
+      const items = await listFolderContents(accessToken, entry.id)
+      setChildren(items)
+    } catch (e) {
+      setErr('Failed to load')
+    } finally {
+      setLoading(false)
+    }
+  }, [accessToken, entry.id])
+
+  // Reload this folder's children when a file was just created inside it
+  useEffect(() => {
+    if (refreshTarget?.id === entry.id && refreshTarget?.key && open) {
+      loadChildren()
+    }
+  }, [refreshTarget?.key]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const toggle = async () => {
     if (open) { setOpen(false); return }
+    onFolderChange?.({ id: entry.id, name: entry.name })
     if (children === null) {
-      setLoading(true)
-      setErr(null)
-      try {
-        const items = await listFolderContents(accessToken, entry.id)
-        setChildren(items)
-      } catch (e) {
-        setErr('Failed to load')
-      } finally {
-        setLoading(false)
-      }
+      await loadChildren()
     }
     setOpen(true)
   }
@@ -66,8 +78,8 @@ function TreeNode({ entry, depth, currentFileId, accessToken, onFilePicked, onNe
             role="button"
             tabIndex={0}
             title="New file here"
-            onClick={(e) => { e.stopPropagation(); onNewFile?.(entry.id) }}
-            onKeyDown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); onNewFile?.(entry.id) } }}
+            onClick={(e) => { e.stopPropagation(); onNewFile?.({ id: entry.id, name: entry.name }) }}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); onNewFile?.({ id: entry.id, name: entry.name }) } }}
           >
             +
           </span>
@@ -83,12 +95,14 @@ function TreeNode({ entry, depth, currentFileId, accessToken, onFilePicked, onNe
           {folders.map(c => (
             <TreeNode key={c.id} entry={{ ...c, _isFolder: true }} depth={depth + 1}
               currentFileId={currentFileId} accessToken={accessToken}
-              onFilePicked={onFilePicked} onNewFile={onNewFile} />
+              onFilePicked={onFilePicked} onNewFile={onNewFile}
+              onFolderChange={onFolderChange} refreshTarget={refreshTarget} />
           ))}
           {files.map(c => (
             <TreeNode key={c.id} entry={c} depth={depth + 1}
               currentFileId={currentFileId} accessToken={accessToken}
-              onFilePicked={onFilePicked} onNewFile={onNewFile} />
+              onFilePicked={onFilePicked} onNewFile={onNewFile}
+              onFolderChange={onFolderChange} refreshTarget={refreshTarget} />
           ))}
           {folders.length === 0 && files.length === 0 && (
             <div className="tree-status" style={{ paddingLeft: 18 + (depth + 1) * 14 }}>empty</div>
@@ -101,7 +115,7 @@ function TreeNode({ entry, depth, currentFileId, accessToken, onFilePicked, onNe
 
 // ── Folder browser shell ──────────────────────────────────────────────────────
 
-export default function FolderBrowser({ currentFileId, onFilePicked, onNewFileInFolder, isMobile, onClose, width, onResizeStart }) {
+export default function FolderBrowser({ currentFileId, onFilePicked, onNewFileInFolder, onFolderChange, isMobile, onClose, width, onResizeStart, refreshTarget }) {
   const { accessToken } = useAuth()
   const [roots, setRoots] = useState(null)   // null = loading
   const [err, setErr]     = useState(null)
@@ -152,6 +166,8 @@ export default function FolderBrowser({ currentFileId, onFilePicked, onNewFileIn
             accessToken={accessToken}
             onFilePicked={handleFilePicked}
             onNewFile={onNewFileInFolder}
+            onFolderChange={onFolderChange}
+            refreshTarget={refreshTarget}
           />
         ))}
       </div>
