@@ -1,6 +1,6 @@
-# VCP Markdown Editor
+# Markdown Editor
 
-A mobile-first collaborative markdown editor backed by Google Drive, built for document review workflows at Value Capture Partners. Supports real-time track changes, inline comments, AI-assisted content capture, and a Kanban board — all stored as plain `.md` files in your Drive.
+A mobile-first collaborative markdown editor backed by Google Drive. Supports real-time track changes, inline comments, AI-assisted content capture, and a Kanban board — all stored as plain `.md` files in your Drive.
 
 ---
 
@@ -55,7 +55,7 @@ Full implementation of the [CriticMarkup](https://criticmarkup.com/) standard:
 A quick-capture screen for notes, meeting recaps, and dictation:
 - Paste, type, or dictate raw text
 - Processed by Gemini (Vertex AI) to clean grammar, structure as markdown, suggest context, and detect tasks
-- Saves automatically to `/vcp/inbox/` with frontmatter metadata (context, author, timestamp, source)
+- Saves automatically to a configured inbox folder with frontmatter metadata (context, author, timestamp, source)
 
 ### Progressive Web App
 - Installable on desktop and mobile (standalone display mode)
@@ -131,19 +131,7 @@ npm run lint       # Lint
 
 ## Drive Folder Structure
 
-The app expects the following layout in your Drive (My Drive or a Shared Drive named "VCP"):
-
-```
-/vcp/
-├── inbox/        ← AI Capture saves here
-├── clients/      ← Client/engagement folders (shown as capture contexts)
-├── ops/
-├── brain/
-├── templates/
-└── seed/
-```
-
-`board.md` files can live anywhere — the Kanban screen searches for them by filename across all drives.
+The AI Capture feature expects an `inbox` folder in a configured Shared Drive, and optionally a `clients` folder whose subfolders appear as context chips. `board.md` files can live anywhere — the Kanban screen searches for them by filename across all drives.
 
 ---
 
@@ -182,4 +170,4 @@ npm test
 
 ## License
 
-Private — Value Capture Partners
+MIT
