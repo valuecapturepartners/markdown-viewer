@@ -1,0 +1,341 @@
+/* Kanban Dashboard Styles */
+
+/* Shell & Header — follows capture-shell / capture-header pattern */
+.kanban-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.kanban-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  height: 44px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  flex-shrink: 0;
+}
+
+.kanban-header .app-title {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+  margin-right: 4px;
+}
+
+.kanban-header .header-spacer {
+  flex: 1;
+}
+
+.kanban-header .user-block {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+.kanban-header .user-block img {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+/* Filter Bar */
+.kanban-filters {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+
+.kanban-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.kanban-filter-group .filter-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.kanban-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  font-size: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-2);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.kanban-chip:hover {
+  border-color: var(--border-2);
+  background: var(--bg-hover);
+}
+
+.kanban-chip.active {
+  background: var(--accent-bg);
+  color: var(--accent);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+/* Board layout */
+.kanban-board {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+  padding: 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+/* Loading & empty states */
+.kanban-loading,
+.kanban-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  color: var(--text-3);
+  font-size: 14px;
+}
+
+.kanban-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  color: var(--red);
+  font-size: 14px;
+}
+
+/* Column */
+.kanban-column {
+  flex: 1;
+  min-width: 280px;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-2);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.kanban-column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.kanban-column-title {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.kanban-column-count {
+  background: var(--bg-3);
+  color: var(--text-3);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 8px;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.kanban-column-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.kanban-column-body.drag-over {
+  background: var(--accent-bg);
+}
+
+.kanban-column-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0 8px 8px;
+  padding: 8px;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-3);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.kanban-column-add:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+/* Card */
+.kanban-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  cursor: grab;
+  transition:
+    box-shadow 0.15s,
+    border-color 0.15s;
+  touch-action: none;
+}
+
+.kanban-card:hover {
+  border-color: var(--border-2);
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.kanban-card.dragging {
+  opacity: 0.4;
+}
+
+.kanban-card-desc {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 8px;
+  line-height: 1.35;
+}
+
+.kanban-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.kanban-card-owner {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 10px;
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+.kanban-card-due {
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.kanban-card-due.overdue {
+  color: var(--red);
+  font-weight: 600;
+}
+
+.kanban-card-source {
+  font-size: 11px;
+  color: var(--text-4);
+}
+
+.kanban-card-board {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  font-size: 10px;
+  border-radius: 10px;
+  background: var(--bg-3);
+  color: var(--text-3);
+  margin-left: auto;
+}
+
+/* Drag overlay (the card being dragged) */
+.kanban-drag-overlay {
+  box-shadow: 0 8px 24px var(--shadow-lg);
+  transform: rotate(2deg);
+  opacity: 0.95;
+}
+
+/* Conflict banner */
+.kanban-conflict {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: var(--yellow-bg);
+  color: var(--text);
+  font-size: 13px;
+  border-bottom: 1px solid var(--yellow);
+  flex-shrink: 0;
+}
+
+.kanban-conflict button {
+  background: var(--yellow);
+  color: #000;
+  border: none;
+  padding: 4px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Mobile */
+@media (max-width: 767px) {
+  .kanban-header {
+    height: 48px;
+  }
+
+  .kanban-board {
+    flex-direction: column;
+    overflow-x: visible;
+    overflow-y: auto;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .kanban-column {
+    min-width: unset;
+    max-width: unset;
+  }
+
+  .kanban-filters {
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 12px;
+  }
+
+  .kanban-filter-group {
+    flex-wrap: wrap;
+  }
+}
