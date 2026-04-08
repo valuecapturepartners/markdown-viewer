@@ -216,7 +216,7 @@ function formatSlug(slug) {
 // ── Main dialog ───────────────────────────────────────────────────────────────
 
 export default function NewFileDialog({ currentFolder, onCreated, onClose }) {
-  const [mode, setMode] = useState('dump') // 'dump' | 'dedicated'
+  const [mode, setMode] = useState('dedicated') // 'dump' | 'dedicated'
 
   return (
     <div className="dialog-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
