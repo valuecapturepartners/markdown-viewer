@@ -17,6 +17,9 @@ export default function KanbanCard({ task, onEdit }) {
       {...attributes}
     >
       <div className="kanban-card-desc">{task.description}</div>
+      {task.details && (
+        <div className="kanban-card-details">{task.details}</div>
+      )}
       <div className="kanban-card-meta">
         {task.owner && <span className="kanban-card-owner">{task.owner}</span>}
         {task.due && (

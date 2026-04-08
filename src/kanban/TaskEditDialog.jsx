@@ -6,6 +6,7 @@ export default function TaskEditDialog({ task, onSave, onClose }) {
   const [status, setStatus] = useState(task.status);
   const [due, setDue] = useState(task.due);
   const [source, setSource] = useState(task.source);
+  const [details, setDetails] = useState(task.details || "");
   const descRef = useRef(null);
 
   useEffect(() => {
@@ -21,6 +22,7 @@ export default function TaskEditDialog({ task, onSave, onClose }) {
       status,
       due,
       source,
+      details: details.trim(),
     });
   };
 
@@ -85,6 +87,15 @@ export default function TaskEditDialog({ task, onSave, onClose }) {
               value={source}
               onChange={(e) => setSource(e.target.value)}
               placeholder="e.g. weekly-sync"
+            />
+          </label>
+          <label>
+            Details
+            <textarea
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+              rows={4}
+              placeholder="Additional context, bullet points, notes..."
             />
           </label>
           <div className="dialog-actions">

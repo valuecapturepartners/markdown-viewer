@@ -1,4 +1,5 @@
 const TASK_RE = /^- \[([ xX])\] (.+)$/;
+const INDENT_RE = /^[ \t]+/;
 
 export function parseBoard(content, boardMeta = {}) {
   const { fileId = "", boardLabel = "" } = boardMeta;
@@ -35,12 +36,49 @@ export function parseBoard(content, boardMeta = {}) {
       }
     }
 
+    // Collect indented continuation lines as details
+    const detailLines = [];
+    let endLine = i;
+    while (endLine + 1 < lines.length && INDENT_RE.test(lines[endLine + 1])) {
+      endLine++;
+      detailLines.push(lines[endLine].replace(/^  /, ""));
+    }
+
+    // Parse details block: lines starting with "details:" header
+    let details = "";
+    if (detailLines.length > 0) {
+      const firstTrimmed = detailLines[0].trim().toLowerCase();
+      if (firstTrimmed === "details:" || firstTrimmed.startsWith("details:")) {
+        // If "details:" is alone on the line, content is the remaining lines
+        if (firstTrimmed === "details:") {
+          details = detailLines
+            .slice(1)
+            .map((l) => l.replace(/^  /, ""))
+            .join("\n")
+            .trim();
+        } else {
+          // "details: some inline content" — take value after colon + remaining lines
+          const inlineVal = detailLines[0].trim().slice("details:".length).trim();
+          const remaining = detailLines
+            .slice(1)
+            .map((l) => l.replace(/^  /, ""))
+            .join("\n")
+            .trim();
+          details = remaining ? `${inlineVal}\n${remaining}` : inlineVal;
+        }
+      } else {
+        // Non-details indented lines (e.g. "From inbox: ...") — treat as context, not details
+        details = "";
+      }
+    }
+
     tasks.push({
       id: `${fileId}:${i}`,
       fileId,
       boardLabel,
       lineIndex: i,
-      rawLine: line,
+      lineCount: endLine - i + 1,
+      rawLine: lines.slice(i, endLine + 1).join("\n"),
       done,
       description,
       owner: fields.owner || "",
@@ -48,6 +86,7 @@ export function parseBoard(content, boardMeta = {}) {
       status: fields.status || "backlog",
       due: fields.due === "—" ? "" : fields.due || "",
       source: fields.source || "",
+      details,
       doneDate,
     });
   }
@@ -67,18 +106,35 @@ export function serializeTask(task) {
   if (task.done && task.doneDate) {
     line += ` ✅ ${task.doneDate}`;
   }
+  if (task.details) {
+    const detailLines = task.details
+      .split("\n")
+      .map((l) => `    ${l}`)
+      .join("\n");
+    line += `\n  details:\n${detailLines}`;
+  }
   return line;
 }
 
-export function updateBoardContent(content, lineIndex, newLine, expectedRaw) {
+export function updateBoardContent(
+  content,
+  lineIndex,
+  newLine,
+  expectedRaw,
+  lineCount = 1,
+) {
   const lines = content.split("\n");
   if (lineIndex < 0 || lineIndex >= lines.length) {
     return { updatedContent: content, conflict: true };
   }
-  if (expectedRaw && lines[lineIndex] !== expectedRaw) {
-    return { updatedContent: content, conflict: true };
+  if (expectedRaw) {
+    const actual = lines.slice(lineIndex, lineIndex + lineCount).join("\n");
+    if (actual !== expectedRaw) {
+      return { updatedContent: content, conflict: true };
+    }
   }
-  lines[lineIndex] = newLine;
+  const newLines = newLine.split("\n");
+  lines.splice(lineIndex, lineCount, ...newLines);
   return { updatedContent: lines.join("\n"), conflict: false };
 }
 

@@ -34,6 +34,7 @@ describe("parseBoard", () => {
     expect(t.source).toBe("inbox-2026-03-24");
     expect(t.done).toBe(false);
     expect(t.doneDate).toBe("");
+    expect(t.details).toBe("");
   });
 
   it("parses done tasks with completion date", () => {
@@ -104,6 +105,52 @@ Some text paragraph
     expect(tasks[0].fileId).toBe("fid");
     expect(tasks[0].boardLabel).toBe("clients/acme");
   });
+
+  it("parses details block with header on own line", () => {
+    const content = `- [ ] Prepare portco template | owner:max | priority:medium | status:backlog | due:— | source:inbox-2026-04-08
+  details:
+    - Template is sent to the portcos before the workshop
+    - Purpose: give VCP an overview
+    - Keep it simple`;
+    const tasks = parseBoard(content);
+    expect(tasks).toHaveLength(1);
+    expect(tasks[0].details).toBe(
+      "- Template is sent to the portcos before the workshop\n- Purpose: give VCP an overview\n- Keep it simple",
+    );
+  });
+
+  it("tracks lineCount for multi-line tasks", () => {
+    const content = `- [ ] Task with details | status:backlog
+  details:
+    - Point one
+    - Point two
+- [ ] Simple task | status:active`;
+    const tasks = parseBoard(content);
+    expect(tasks[0].lineCount).toBe(4);
+    expect(tasks[1].lineCount).toBe(1);
+  });
+
+  it("rawLine includes continuation lines for multi-line tasks", () => {
+    const content = `- [ ] Task | status:backlog
+  details:
+    - Note`;
+    const tasks = parseBoard(content);
+    expect(tasks[0].rawLine).toBe(content);
+  });
+
+  it("treats non-details indented lines as context (no details)", () => {
+    const tasks = parseBoard(SAMPLE_BOARD, { fileId: "f1", boardLabel: "ops" });
+    // Task 2 has "From inbox:..." indented line — not a details block
+    expect(tasks[2].details).toBe("");
+    expect(tasks[2].lineCount).toBe(2);
+  });
+
+  it("defaults details to empty string for tasks without them", () => {
+    const content = "- [ ] Simple task | status:active";
+    const tasks = parseBoard(content);
+    expect(tasks[0].details).toBe("");
+    expect(tasks[0].lineCount).toBe(1);
+  });
 });
 
 describe("serializeTask", () => {
@@ -116,6 +163,7 @@ describe("serializeTask", () => {
       status: "active",
       due: "2026-05-01",
       source: "weekly",
+      details: "",
       doneDate: "",
     });
     expect(line).toBe(
@@ -132,6 +180,7 @@ describe("serializeTask", () => {
       status: "done",
       due: "2026-04-01",
       source: "standup",
+      details: "",
       doneDate: "2026-04-08",
     });
     expect(line).toContain("- [x]");
@@ -148,11 +197,29 @@ describe("serializeTask", () => {
       status: "backlog",
       due: "",
       source: "",
+      details: "",
       doneDate: "",
     });
     expect(line).toContain("due:—");
     expect(line).not.toContain("owner:");
     expect(line).not.toContain("source:");
+  });
+
+  it("serializes task with details block", () => {
+    const line = serializeTask({
+      done: false,
+      description: "Prepare template",
+      owner: "max",
+      priority: "medium",
+      status: "backlog",
+      due: "",
+      source: "inbox-2026-04-08",
+      details: "- Send to portcos\n- Keep it simple",
+      doneDate: "",
+    });
+    expect(line).toBe(
+      `- [ ] Prepare template | owner:max | priority:medium | status:backlog | due:— | source:inbox-2026-04-08\n  details:\n    - Send to portcos\n    - Keep it simple`,
+    );
   });
 
   it("round-trips through parse and serialize", () => {
@@ -166,6 +233,16 @@ describe("serializeTask", () => {
   it("round-trips a done task", () => {
     const original =
       "- [x] Finished task | owner:max | priority:high | status:done | due:2026-04-01 | source:weekly ✅ 2026-04-08";
+    const tasks = parseBoard(original);
+    const serialized = serializeTask(tasks[0]);
+    expect(serialized).toBe(original);
+  });
+
+  it("round-trips a task with details", () => {
+    const original = `- [ ] Template prep | owner:max | priority:medium | status:backlog | due:— | source:inbox
+  details:
+    - Bullet one
+    - Bullet two`;
     const tasks = parseBoard(original);
     const serialized = serializeTask(tasks[0]);
     expect(serialized).toBe(original);
@@ -205,6 +282,33 @@ describe("updateBoardContent", () => {
   it("detects conflict for out-of-range index", () => {
     const { conflict } = updateBoardContent("single line", 5, "nope", "nope");
     expect(conflict).toBe(true);
+  });
+
+  it("replaces multi-line block using lineCount", () => {
+    const content = "line0\n- [ ] Task | status:backlog\n  details:\n    - Note\nline4";
+    const { updatedContent, conflict } = updateBoardContent(
+      content,
+      1,
+      "- [ ] Task | status:active | due:—",
+      "- [ ] Task | status:backlog\n  details:\n    - Note",
+      3,
+    );
+    expect(conflict).toBe(false);
+    expect(updatedContent).toBe("line0\n- [ ] Task | status:active | due:—\nline4");
+  });
+
+  it("replaces single-line with multi-line (adding details)", () => {
+    const content = "line0\n- [ ] Task | status:backlog\nline2";
+    const newLine = "- [ ] Task | status:backlog\n  details:\n    - New note";
+    const { updatedContent, conflict } = updateBoardContent(
+      content,
+      1,
+      newLine,
+      "- [ ] Task | status:backlog",
+      1,
+    );
+    expect(conflict).toBe(false);
+    expect(updatedContent).toBe("line0\n- [ ] Task | status:backlog\n  details:\n    - New note\nline2");
   });
 });
 

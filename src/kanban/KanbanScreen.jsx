@@ -229,6 +229,7 @@ export default function KanbanScreen({ onOpenEditor, onOpenCapture, inMobileShel
           task.lineIndex,
           newLine,
           task.rawLine,
+          task.lineCount || 1,
         );
         if (conflict) {
           dispatch({
@@ -272,6 +273,7 @@ export default function KanbanScreen({ onOpenEditor, onOpenCapture, inMobileShel
           task.lineIndex,
           newLine,
           task.rawLine,
+          task.lineCount || 1,
         );
         if (conflict) {
           dispatch({
@@ -303,6 +305,7 @@ export default function KanbanScreen({ onOpenEditor, onOpenCapture, inMobileShel
         fileId: taskData.fileId,
         boardLabel: board.label,
         lineIndex: -1,
+        lineCount: 1,
         rawLine: "",
         done: taskData.status === "done",
         description: taskData.description,
@@ -311,6 +314,7 @@ export default function KanbanScreen({ onOpenEditor, onOpenCapture, inMobileShel
         status: taskData.status,
         due: taskData.due,
         source: taskData.source,
+        details: taskData.details || "",
         doneDate:
           taskData.status === "done"
             ? new Date().toISOString().slice(0, 10)

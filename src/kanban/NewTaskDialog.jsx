@@ -10,6 +10,7 @@ export default function NewTaskDialog({
   const [owner, setOwner] = useState("");
   const [due, setDue] = useState("");
   const [source, setSource] = useState("");
+  const [details, setDetails] = useState("");
   const [boardFileId, setBoardFileId] = useState(boards[0]?.fileId || "");
   const descRef = useRef(null);
 
@@ -27,6 +28,7 @@ export default function NewTaskDialog({
       status: defaultStatus,
       due,
       source,
+      details: details.trim(),
       fileId: boardFileId,
     });
   };
@@ -85,6 +87,15 @@ export default function NewTaskDialog({
               value={source}
               onChange={(e) => setSource(e.target.value)}
               placeholder="e.g. weekly-sync"
+            />
+          </label>
+          <label>
+            Details
+            <textarea
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+              rows={3}
+              placeholder="Additional context, bullet points, notes..."
             />
           </label>
           {boards.length > 1 && (
