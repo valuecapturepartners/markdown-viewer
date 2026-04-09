@@ -7,7 +7,7 @@ import Toolbar from "./Toolbar.jsx";
 import CommentDialog from "./CommentDialog.jsx";
 import NewFileDialog from "./NewFileDialog.jsx";
 import FolderBrowser from "../drive/FolderBrowser.jsx";
-import { readFile, saveFile } from "../drive/drive-api.js";
+import { readFile, saveFile, getFileMetadata } from "../drive/drive-api.js";
 import {
   hasCriticMarkup,
   acceptAll,
@@ -173,26 +173,35 @@ export default function Editor({ onOpenCapture, onOpenKanban, hideSidebar, onBac
   }, []);
   const [isTracking, setIsTracking] = useState(false);
 
-  // Reload last open file on mount
+  // Reload last open file on mount; also handles ?file=<id> deep-links.
+  // Skipped on mobile — MobileShell manages the open file via the fileToOpen prop.
   useEffect(() => {
+    if (hideSidebar) return;
+    const urlFileId = new URLSearchParams(location.search).get('file');
     const stored = (() => {
-      try {
-        return JSON.parse(sessionStorage.getItem(LAST_FILE_KEY));
-      } catch {
-        return null;
-      }
+      try { return JSON.parse(sessionStorage.getItem(LAST_FILE_KEY)); } catch { return null; }
     })();
-    if (stored?.id) {
-      readFile(accessToken, stored.id)
-        .then((text) => {
-          setContent(text);
-          setIsTracking(hasCriticMarkup(text));
-        })
-        .catch(() => {
-          setCurrentFile(null);
-          sessionStorage.removeItem(LAST_FILE_KEY);
-        });
-    }
+    const fileId = urlFileId || stored?.id;
+    if (!fileId) return;
+    const load = async () => {
+      try {
+        let name = stored?.id === fileId ? stored?.name : null;
+        if (!name) {
+          const meta = await getFileMetadata(accessToken, fileId);
+          name = meta.name;
+        }
+        const text = await readFile(accessToken, fileId);
+        setContent(text);
+        setCurrentFile({ id: fileId, name });
+        setIsTracking(hasCriticMarkup(text));
+        sessionStorage.setItem(LAST_FILE_KEY, JSON.stringify({ id: fileId, name }));
+        history.replaceState(null, '', '?file=' + fileId);
+      } catch {
+        setCurrentFile(null);
+        sessionStorage.removeItem(LAST_FILE_KEY);
+      }
+    };
+    load();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // When mobile shell picks a file, load it
@@ -204,6 +213,7 @@ export default function Editor({ onOpenCapture, onOpenKanban, hideSidebar, onBac
         setCurrentFile({ id: fileToOpen.id, name: fileToOpen.name });
         setIsTracking(hasCriticMarkup(text));
         sessionStorage.setItem(LAST_FILE_KEY, JSON.stringify({ id: fileToOpen.id, name: fileToOpen.name }));
+        history.replaceState(null, '', '?file=' + fileToOpen.id);
         setSaveStatus("");
       })
       .catch(() => {
@@ -247,6 +257,7 @@ export default function Editor({ onOpenCapture, onOpenKanban, hideSidebar, onBac
         setCurrentFile({ id, name });
         setIsTracking(hasCriticMarkup(text));
         sessionStorage.setItem(LAST_FILE_KEY, JSON.stringify({ id, name }));
+        history.replaceState(null, '', '?file=' + id);
         setSaveStatus("");
       } catch (err) {
         alert(`Failed to open file: ${err.message}`);
@@ -323,6 +334,7 @@ export default function Editor({ onOpenCapture, onOpenKanban, hideSidebar, onBac
       }
       setCurrentFile({ id, name });
       sessionStorage.setItem(LAST_FILE_KEY, JSON.stringify({ id, name }));
+      history.replaceState(null, '', '?file=' + id);
       setSaveStatus("");
       // Refresh the parent folder in the tree so the new file appears
       const folder = currentBrowseFolderRef.current;

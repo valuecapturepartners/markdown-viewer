@@ -1,14 +1,17 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Editor from '../editor/Editor.jsx'
 import KanbanScreen from '../kanban/KanbanScreen.jsx'
 import CaptureScreen from '../capture/CaptureScreen.jsx'
 import NewFileDialog from '../editor/NewFileDialog.jsx'
 import FolderView from './FolderView.jsx'
+import { useAuth } from '../auth/auth-context.jsx'
+import { getFileMetadata } from '../drive/drive-api.js'
 
 // fileStack entries: { type: 'root' } | { type: 'folder', id, name } | { type: 'file', id, name }
 const ROOT = { type: 'root' }
 
 export default function MobileShell() {
+  const { accessToken } = useAuth()
   const [activeTab, setActiveTab]     = useState('files')
   const [fileStack, setFileStack]     = useState([ROOT])
   const [captureOpen, setCaptureOpen] = useState(false)
@@ -25,10 +28,27 @@ export default function MobileShell() {
   const pushFile = (file) => {
     setFileStack(s => [...s, { type: 'file', ...file }])
     setFileToOpen(file)
+    history.replaceState(null, '', '?file=' + file.id)
   }
 
-  const pop = () =>
-    setFileStack(s => s.length > 1 ? s.slice(0, -1) : s)
+  const pop = () => {
+    setFileStack(s => {
+      const next = s.length > 1 ? s.slice(0, -1) : s
+      if (next[next.length - 1].type !== 'file') {
+        history.replaceState(null, '', location.pathname)
+      }
+      return next
+    })
+  }
+
+  // Open file from ?file=<id> deep-link
+  useEffect(() => {
+    const fileId = new URLSearchParams(location.search).get('file')
+    if (!fileId || !accessToken) return
+    getFileMetadata(accessToken, fileId)
+      .then(meta => pushFile({ id: meta.id, name: meta.name }))
+      .catch(() => {})
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleFileCreatedFromDialog = (file) => {
     setNewFileFolder(undefined)
