@@ -324,7 +324,96 @@
   font-weight: 600;
 }
 
-/* Move button — hidden on desktop, visible on mobile */
+/* ── Mobile kanban view ─────────────────────────────────────────────────── */
+
+.km-shell {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background: var(--bg);
+}
+
+/* Segmented control */
+.km-seg {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  flex-shrink: 0;
+}
+
+.km-seg-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 8px;
+  border: none;
+  background: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.km-seg-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+
+.km-seg-count {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: var(--bg-3);
+  color: var(--text-3);
+}
+
+.km-seg-btn.active .km-seg-count {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+/* Scrollable list */
+.km-list {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.km-card {
+  cursor: pointer;
+  padding: 14px 14px;
+}
+
+.km-empty {
+  text-align: center;
+  padding: 40px 16px;
+  color: var(--text-3);
+  font-size: 14px;
+}
+
+.km-add {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+/* Move button — always visible in mobile view, hidden on desktop board */
+.km-card .kanban-card-move-btn {
+  display: inline-flex;
+}
+
+/* Move button — hidden on desktop board */
 .kanban-card-move-btn {
   display: none;
 }

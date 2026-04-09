@@ -6,11 +6,25 @@ import {
   useSensors,
   DragOverlay,
 } from "@dnd-kit/core";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import KanbanColumn from "./KanbanColumn.jsx";
 import KanbanCard from "./KanbanCard.jsx";
+import KanbanMobileView from "./KanbanMobileView.jsx";
 
 const COLUMNS = ["backlog", "active", "done"];
+
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(
+    () => window.matchMedia("(max-width: 767px)").matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const handler = (e) => setIsMobile(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return isMobile;
+}
 
 export default function KanbanBoard({
   tasksByStatus,
@@ -19,7 +33,19 @@ export default function KanbanBoard({
   onTaskEdit,
   onTaskAdd,
 }) {
+  const isMobile = useIsMobile();
   const [activeId, setActiveId] = useState(null);
+
+  if (isMobile) {
+    return (
+      <KanbanMobileView
+        tasksByStatus={tasksByStatus}
+        onTaskEdit={onTaskEdit}
+        onTaskAdd={onTaskAdd}
+        onTaskMove={onTaskMove}
+      />
+    );
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
