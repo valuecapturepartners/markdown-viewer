@@ -81,7 +81,7 @@ export async function getFileMetadata(token, fileId) {
 
 // List folders + .md files inside a folder (My Drive or Shared Drive subfolder)
 export async function listFolderContents(token, folderId = "root") {
-  const q = `'${folderId}' in parents and trashed=false and (mimeType='application/vnd.google-apps.folder' or mimeType='text/markdown' or mimeType='text/plain')`;
+  const q = `'${folderId}' in parents and trashed=false and (mimeType='application/vnd.google-apps.folder' or mimeType='text/markdown' or mimeType='text/plain' or mimeType='application/pdf')`;
   const params = new URLSearchParams({
     q,
     fields: "files(id,name,mimeType,modifiedTime)",

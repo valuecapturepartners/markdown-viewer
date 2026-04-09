@@ -3,6 +3,7 @@ import { useAuth } from '../auth/auth-context.jsx'
 import { listFolderContents, listSharedDrives } from './drive-api.js'
 
 const FOLDER_MIME = 'application/vnd.google-apps.folder'
+const PDF_MIME    = 'application/pdf'
 
 function formatDate(iso) {
   if (!iso) return ''
@@ -50,7 +51,28 @@ function TreeNode({ entry, depth, currentFileId, accessToken, onFilePicked, onNe
   const indent = depth * 14 // px per level
 
   if (!isFolder) {
-    const isActive = entry.id === currentFileId
+    const isPdf    = entry.mimeType === PDF_MIME
+    const isActive = !isPdf && entry.id === currentFileId
+    const label    = isPdf
+      ? entry.name.replace(/\.pdf$/i, '')
+      : entry.name.replace(/\.md$/i, '')
+
+    if (isPdf) {
+      return (
+        <a
+          className="tree-file tree-file-pdf"
+          style={{ paddingLeft: 16 + indent }}
+          href={`https://drive.google.com/file/d/${entry.id}/view`}
+          target="_blank"
+          rel="noreferrer"
+          title={entry.name}
+        >
+          <span className="tree-file-name">{label}</span>
+          <span className="tree-file-badge">PDF</span>
+        </a>
+      )
+    }
+
     return (
       <button
         className={`tree-file${isActive ? ' active' : ''}`}
@@ -58,7 +80,7 @@ function TreeNode({ entry, depth, currentFileId, accessToken, onFilePicked, onNe
         onClick={() => onFilePicked({ id: entry.id, name: entry.name })}
         title={entry.name}
       >
-        <span className="tree-file-name">{entry.name.replace(/\.md$/i, '')}</span>
+        <span className="tree-file-name">{label}</span>
         <span className="tree-file-date">{formatDate(entry.modifiedTime)}</span>
       </button>
     )

@@ -3,6 +3,7 @@ import { useAuth } from '../auth/auth-context.jsx'
 import { listFolderContents, listSharedDrives } from '../drive/drive-api.js'
 
 const FOLDER_MIME = 'application/vnd.google-apps.folder'
+const PDF_MIME    = 'application/pdf'
 
 function formatDate(iso) {
   if (!iso) return ''
@@ -33,7 +34,9 @@ export default function FolderView({ folder, title, onBack, onFolderPush, onFile
         result = contents.map(item => ({
           id: item.id,
           name: item.name,
+          mimeType: item.mimeType,
           isFolder: item.mimeType === FOLDER_MIME,
+          isPdf: item.mimeType === PDF_MIME,
           modifiedTime: item.modifiedTime,
         }))
       }
@@ -81,16 +84,32 @@ export default function FolderView({ folder, title, onBack, onFolderPush, onFile
           </button>
         ))}
 
-        {files.map(item => (
-          <button
-            key={item.id}
-            className="fv-row fv-file"
-            onClick={() => onFilePick({ id: item.id, name: item.name })}
-          >
-            <span className="fv-row-name">{item.name.replace(/\.md$/i, '')}</span>
-            <span className="fv-date">{formatDate(item.modifiedTime)}</span>
-          </button>
-        ))}
+        {files.map(item => {
+          if (item.isPdf) {
+            return (
+              <a
+                key={item.id}
+                className="fv-row fv-file fv-file-pdf"
+                href={`https://drive.google.com/file/d/${item.id}/view`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span className="fv-row-name">{item.name.replace(/\.pdf$/i, '')}</span>
+                <span className="fv-badge">PDF</span>
+              </a>
+            )
+          }
+          return (
+            <button
+              key={item.id}
+              className="fv-row fv-file"
+              onClick={() => onFilePick({ id: item.id, name: item.name })}
+            >
+              <span className="fv-row-name">{item.name.replace(/\.md$/i, '')}</span>
+              <span className="fv-date">{formatDate(item.modifiedTime)}</span>
+            </button>
+          )
+        })}
 
         {!loading && !error && folders.length === 0 && files.length === 0 && (
           <div className="fv-status">Empty</div>

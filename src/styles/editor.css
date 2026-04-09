@@ -632,6 +632,22 @@ body.sidebar-resizing {
 .tree-file:hover .tree-file-date { color: var(--text-3); }
 .tree-file.active .tree-file-date { color: var(--blue); opacity: 0.7; }
 
+.tree-file-badge {
+  flex-shrink: 0;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--text-4);
+  background: var(--bg-hover);
+  border-radius: 3px;
+  padding: 1px 4px;
+}
+a.tree-file-pdf {
+  text-decoration: none;
+  color: var(--text-3);
+}
+a.tree-file-pdf:hover { background: var(--bg-hover); color: var(--text-2); }
+
 .tree-children { border-left: 1px solid var(--border); margin-left: 16px; }
 
 .tree-status { font-size: 11px; color: var(--text-4); font-style: italic; padding: 3px 0; }
