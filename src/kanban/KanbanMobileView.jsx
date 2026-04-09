@@ -1,21 +1,67 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 const COLUMNS = ["backlog", "active", "done"];
 const COLUMN_LABELS = { backlog: "Backlog", active: "Active", done: "Done" };
-const OTHER_STATUSES = {
-  backlog: ["active", "done"],
-  active: ["backlog", "done"],
-  done: ["backlog", "active"],
-};
+const NEXT_STATUS = { backlog: "active", active: "done", done: "backlog" };
+const LONG_PRESS_MS = 500;
 
 function MobileCard({ task, onEdit, onMove }) {
-  const [showMover, setShowMover] = useState(false);
+  const timerRef = useRef(null);
+  const didLongPress = useRef(false);
+  const startPos = useRef(null);
+  const [pressing, setPressing] = useState(false);
 
   const isOverdue =
     task.due && new Date(task.due) < new Date() && task.status !== "done";
 
+  function startPress(x, y) {
+    didLongPress.current = false;
+    startPos.current = { x, y };
+    setPressing(true);
+    timerRef.current = setTimeout(() => {
+      didLongPress.current = true;
+      setPressing(false);
+      navigator.vibrate?.(40);
+      onMove(task.id, NEXT_STATUS[task.status]);
+    }, LONG_PRESS_MS);
+  }
+
+  function cancelPress() {
+    clearTimeout(timerRef.current);
+    setPressing(false);
+  }
+
+  function handlePointerDown(e) {
+    // Only primary button / first touch
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    startPress(e.clientX, e.clientY);
+  }
+
+  function handlePointerMove(e) {
+    if (!startPos.current) return;
+    const dx = Math.abs(e.clientX - startPos.current.x);
+    const dy = Math.abs(e.clientY - startPos.current.y);
+    if (dx > 8 || dy > 8) cancelPress(); // finger moved → scroll intent, abort
+  }
+
+  function handleClick(e) {
+    if (didLongPress.current) {
+      e.preventDefault();
+      return;
+    }
+    onEdit(task);
+  }
+
   return (
-    <div className="kanban-card km-card" onClick={() => onEdit(task)}>
+    <div
+      className={`kanban-card km-card${pressing ? " km-pressing" : ""}`}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={cancelPress}
+      onPointerCancel={cancelPress}
+      onPointerLeave={cancelPress}
+      onClick={handleClick}
+    >
       <div className="kanban-card-desc">{task.description}</div>
       {task.details && (
         <div className="kanban-card-details">{task.details}</div>
@@ -31,33 +77,7 @@ function MobileCard({ task, onEdit, onMove }) {
         {task.boardLabel && (
           <span className="kanban-card-board">{task.boardLabel}</span>
         )}
-        <button
-          className="kanban-card-move-btn"
-          onClick={(e) => {
-            e.stopPropagation();
-            setShowMover((v) => !v);
-          }}
-        >
-          ⇄ Move
-        </button>
       </div>
-      {showMover && (
-        <div className="kanban-card-mover" onClick={(e) => e.stopPropagation()}>
-          {OTHER_STATUSES[task.status].map((s) => (
-            <button
-              key={s}
-              className="kanban-card-mover-btn"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowMover(false);
-                onMove(task.id, s);
-              }}
-            >
-              → {COLUMN_LABELS[s]}
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
@@ -71,13 +91,8 @@ export default function KanbanMobileView({
   const [activeCol, setActiveCol] = useState("active");
   const tasks = tasksByStatus[activeCol] || [];
 
-  function handleMove(taskId, newStatus) {
-    onTaskMove(taskId, newStatus);
-  }
-
   return (
     <div className="km-shell">
-      {/* Segmented control */}
       <div className="km-seg">
         {COLUMNS.map((col) => (
           <button
@@ -93,7 +108,6 @@ export default function KanbanMobileView({
         ))}
       </div>
 
-      {/* Scrollable card list */}
       <div className="km-list">
         {tasks.length === 0 && (
           <div className="km-empty">No tasks in {COLUMN_LABELS[activeCol]}</div>
@@ -103,7 +117,7 @@ export default function KanbanMobileView({
             key={task.id}
             task={task}
             onEdit={onTaskEdit}
-            onMove={handleMove}
+            onMove={onTaskMove}
           />
         ))}
         <button

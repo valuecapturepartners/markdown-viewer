@@ -391,9 +391,33 @@
   gap: 10px;
 }
 
+/* Mobile card — override DnD's touch-action: none so scroll works */
 .km-card {
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
   cursor: pointer;
-  padding: 14px 14px;
+  padding: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Long-press progress bar */
+.km-card::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  background: var(--accent);
+  border-radius: 0 2px 2px 0;
+  transition: none;
+}
+
+.km-card.km-pressing::after {
+  width: 100%;
+  transition: width 500ms linear;
 }
 
 .km-empty {
@@ -406,44 +430,6 @@
 .km-add {
   margin: 0;
   flex-shrink: 0;
-}
-
-/* Move button — always visible in mobile view, hidden on desktop board */
-.km-card .kanban-card-move-btn {
-  display: inline-flex;
-}
-
-/* Move button — hidden on desktop board */
-.kanban-card-move-btn {
-  display: none;
-}
-
-/* Move-to picker (inline status selector) */
-.kanban-card-mover {
-  display: flex;
-  gap: 6px;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--border);
-}
-
-.kanban-card-mover-btn {
-  flex: 1;
-  padding: 6px 8px;
-  font-size: 12px;
-  font-weight: 600;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--bg-2);
-  color: var(--text-2);
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.kanban-card-mover-btn:hover {
-  background: var(--accent-bg);
-  border-color: var(--accent);
-  color: var(--accent);
 }
 
 /* Mobile */
@@ -465,12 +451,6 @@
     max-width: unset;
   }
 
-  /* Give each column body a minimum height so empty columns are still
-     large enough to be a usable drop target */
-  .kanban-column-body {
-    min-height: 80px;
-  }
-
   .kanban-filters {
     flex-wrap: wrap;
     gap: 8px;
@@ -479,32 +459,5 @@
 
   .kanban-filter-group {
     flex-wrap: wrap;
-  }
-
-  /* Show the move button on mobile */
-  .kanban-card-move-btn {
-    display: inline-flex;
-    align-items: center;
-    margin-left: auto;
-    padding: 3px 10px;
-    font-size: 11px;
-    font-weight: 600;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--bg-2);
-    color: var(--text-3);
-    cursor: pointer;
-    touch-action: manipulation;
-  }
-
-  .kanban-card-move-btn:active {
-    background: var(--accent-bg);
-    border-color: var(--accent);
-    color: var(--accent);
-  }
-
-  /* Larger tap targets on cards */
-  .kanban-card {
-    padding: 12px 14px;
   }
 }

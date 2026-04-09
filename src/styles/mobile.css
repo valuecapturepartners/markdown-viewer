@@ -40,6 +40,13 @@
     max-height: 85vh;
   }
 
+  /* Prevent iOS from zooming in when focusing inputs (requires font-size >= 16px) */
+  .dialog input,
+  .dialog textarea,
+  .dialog select {
+    font-size: 16px;
+  }
+
   /* Preview: comfortable reading/editing */
   .preview-content {
     padding: 16px;

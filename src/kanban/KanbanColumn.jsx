@@ -7,7 +7,7 @@ const COLUMN_LABELS = {
   done: "Done",
 };
 
-export default function KanbanColumn({ id, tasks, onTaskEdit, onTaskAdd, onTaskMove }) {
+export default function KanbanColumn({ id, tasks, onTaskEdit, onTaskAdd }) {
   const { setNodeRef, isOver } = useDroppable({ id });
 
   return (
@@ -21,7 +21,7 @@ export default function KanbanColumn({ id, tasks, onTaskEdit, onTaskAdd, onTaskM
         className={`kanban-column-body${isOver ? " drag-over" : ""}`}
       >
         {tasks.map((task) => (
-          <KanbanCard key={task.id} task={task} onEdit={onTaskEdit} onMove={onTaskMove} />
+          <KanbanCard key={task.id} task={task} onEdit={onTaskEdit} />
         ))}
       </div>
       <button className="kanban-column-add" onClick={() => onTaskAdd(id)}>

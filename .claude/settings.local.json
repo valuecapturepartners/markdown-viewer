@@ -28,7 +28,8 @@
       "Bash(npm test:*)",
       "Bash(python3:*)",
       "Bash(du -sh /workspace/markdown/*)",
-      "Bash(ls README*)"
+      "Bash(ls README*)",
+      "Bash(grep -n \"listFolderContents\\\\|listSharedDrives\\\\|findFolder\" /workspace/markdown/src/**/*.js /workspace/markdown/src/**/*.jsx)"
     ]
   }
 }
