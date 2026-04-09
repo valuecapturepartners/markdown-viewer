@@ -147,14 +147,20 @@
 
 .preview-content th,
 .preview-content td {
-  border: 1px solid #333;
-  padding: 8px 12px;
+  border: none;
+  border-bottom: 1px solid #444;
+  padding: 2px 12px;
   text-align: left;
 }
 
+.preview-content thead tr {
+  border-bottom: 2px solid #555;
+}
+
 .preview-content th {
-  background: var(--bg-3);
+  background: transparent;
   color: var(--text-head);
+  font-weight: 600;
 }
 
 .preview-content hr {
@@ -331,6 +337,30 @@
   border: none;
   border-top: 1px solid #333;
   margin: 2em 0;
+}
+
+.ProseMirror table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1em;
+  font-size: 14px;
+}
+
+.ProseMirror th,
+.ProseMirror td {
+  border: none;
+  border-bottom: 1px solid #444;
+  padding: 2px 12px;
+  text-align: left;
+}
+
+.ProseMirror thead tr {
+  border-bottom: 2px solid #555;
+}
+
+.ProseMirror th {
+  color: var(--text-head);
+  font-weight: 600;
 }
 
 /* Placeholder */
