@@ -34,10 +34,33 @@
     overflow: hidden;
   }
 
-  /* Dialog: full width on small screens */
+  /* Dialog → bottom sheet on mobile */
+  .dialog-overlay {
+    align-items: flex-end;
+  }
+
   .dialog {
-    width: 96vw;
-    max-height: 85vh;
+    width: 100%;
+    max-width: 100%;
+    max-height: 82vh;
+    overflow-y: auto;
+    border-radius: 18px 18px 0 0;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    padding: 0 20px 32px;
+    padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Drag handle at top of bottom sheet */
+  .dialog::before {
+    content: "";
+    display: block;
+    width: 36px;
+    height: 4px;
+    background: var(--border-2);
+    border-radius: 2px;
+    margin: 12px auto 16px;
   }
 
   /* Prevent iOS from zooming in when focusing inputs (requires font-size >= 16px) */

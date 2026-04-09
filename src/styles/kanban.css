@@ -398,27 +398,65 @@
   -webkit-user-select: none;
   cursor: pointer;
   padding: 14px;
-  position: relative;
-  overflow: hidden;
 }
 
-/* Long-press progress bar */
-.km-card::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 3px;
-  width: 0;
-  background: var(--accent);
-  border-radius: 0 2px 2px 0;
-  transition: none;
+/* ── Status pill & inline picker ────────────────────────────────────────── */
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  margin-left: auto;
+  white-space: nowrap;
+  transition: opacity 0.1s;
+}
+.status-pill:active { opacity: 0.7; }
+
+.status-pill--backlog {
+  background: var(--bg-3);
+  color: var(--text-3);
+  border-color: var(--border);
+}
+.status-pill--active {
+  background: var(--accent-bg);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.status-pill--done {
+  background: var(--green-bg);
+  color: var(--green);
+  border-color: var(--green-border);
 }
 
-.km-card.km-pressing::after {
-  width: 100%;
-  transition: width 500ms linear;
+.status-picker {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
 }
+
+.status-picker-opt {
+  flex: 1;
+  min-width: 70px;
+  padding: 5px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: opacity 0.1s;
+}
+.status-picker-opt.current {
+  box-shadow: inset 0 0 0 2px currentColor;
+}
+.status-picker-opt:active { opacity: 0.7; }
 
 .km-empty {
   text-align: center;

@@ -1,67 +1,17 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
+import StatusPicker from "./StatusPicker.jsx";
 
 const COLUMNS = ["backlog", "active", "done"];
 const COLUMN_LABELS = { backlog: "Backlog", active: "Active", done: "Done" };
-const NEXT_STATUS = { backlog: "active", active: "done", done: "backlog" };
-const LONG_PRESS_MS = 500;
 
 function MobileCard({ task, onEdit, onMove }) {
-  const timerRef = useRef(null);
-  const didLongPress = useRef(false);
-  const startPos = useRef(null);
-  const [pressing, setPressing] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const isOverdue =
     task.due && new Date(task.due) < new Date() && task.status !== "done";
 
-  function startPress(x, y) {
-    didLongPress.current = false;
-    startPos.current = { x, y };
-    setPressing(true);
-    timerRef.current = setTimeout(() => {
-      didLongPress.current = true;
-      setPressing(false);
-      navigator.vibrate?.(40);
-      onMove(task.id, NEXT_STATUS[task.status]);
-    }, LONG_PRESS_MS);
-  }
-
-  function cancelPress() {
-    clearTimeout(timerRef.current);
-    setPressing(false);
-  }
-
-  function handlePointerDown(e) {
-    // Only primary button / first touch
-    if (e.pointerType === "mouse" && e.button !== 0) return;
-    startPress(e.clientX, e.clientY);
-  }
-
-  function handlePointerMove(e) {
-    if (!startPos.current) return;
-    const dx = Math.abs(e.clientX - startPos.current.x);
-    const dy = Math.abs(e.clientY - startPos.current.y);
-    if (dx > 8 || dy > 8) cancelPress(); // finger moved → scroll intent, abort
-  }
-
-  function handleClick(e) {
-    if (didLongPress.current) {
-      e.preventDefault();
-      return;
-    }
-    onEdit(task);
-  }
-
   return (
-    <div
-      className={`kanban-card km-card${pressing ? " km-pressing" : ""}`}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={cancelPress}
-      onPointerCancel={cancelPress}
-      onPointerLeave={cancelPress}
-      onClick={handleClick}
-    >
+    <div className="kanban-card km-card" onClick={() => onEdit(task)}>
       <div className="kanban-card-desc">{task.description}</div>
       {task.details && (
         <div className="kanban-card-details">{task.details}</div>
@@ -77,6 +27,12 @@ function MobileCard({ task, onEdit, onMove }) {
         {task.boardLabel && (
           <span className="kanban-card-board">{task.boardLabel}</span>
         )}
+        <StatusPicker
+          status={task.status}
+          open={pickerOpen}
+          onToggle={(e) => { e.stopPropagation(); setPickerOpen((v) => !v); }}
+          onMove={(s) => { setPickerOpen(false); onMove(task.id, s); }}
+        />
       </div>
     </div>
   );

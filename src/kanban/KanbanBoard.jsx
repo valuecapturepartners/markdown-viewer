@@ -93,6 +93,7 @@ export default function KanbanBoard({
             tasks={tasksByStatus[col] || []}
             onTaskEdit={onTaskEdit}
             onTaskAdd={onTaskAdd}
+            onTaskMove={onTaskMove}
           />
         ))}
       </div>

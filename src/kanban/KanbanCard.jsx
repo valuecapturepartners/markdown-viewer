@@ -1,9 +1,12 @@
 import { useDraggable } from "@dnd-kit/core";
+import { useState } from "react";
+import StatusPicker from "./StatusPicker.jsx";
 
-export default function KanbanCard({ task, onEdit }) {
+export default function KanbanCard({ task, onEdit, onMove }) {
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: task.id,
   });
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   const isOverdue =
     task.due && new Date(task.due) < new Date() && task.status !== "done";
@@ -34,6 +37,12 @@ export default function KanbanCard({ task, onEdit }) {
         {task.boardLabel && (
           <span className="kanban-card-board">{task.boardLabel}</span>
         )}
+        <StatusPicker
+          status={task.status}
+          open={pickerOpen}
+          onToggle={(e) => { e.stopPropagation(); setPickerOpen((v) => !v); }}
+          onMove={(s) => { setPickerOpen(false); if (onMove) onMove(task.id, s); }}
+        />
       </div>
     </div>
   );
