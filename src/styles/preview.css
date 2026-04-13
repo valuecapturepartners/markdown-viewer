@@ -461,10 +461,17 @@
 
 /* Comment atom node */
 .ProseMirror .critic-comment {
-  display: inline;
+  display: inline-flex;
+  align-items: center;
   cursor: pointer;
   font-size: 0.85em;
   vertical-align: super;
+  background: var(--blue-bg, rgba(60, 130, 240, 0.12));
+  border-radius: 4px;
+  padding: 1px 3px;
+}
+.ProseMirror .critic-comment:hover {
+  background: var(--blue-bg-hover, rgba(60, 130, 240, 0.22));
 }
 
 /* Mobile bubble menu — bigger touch targets */

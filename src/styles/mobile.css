@@ -95,18 +95,16 @@
     padding: 4px 8px;
   }
 
-  /* Comment popover: wider on mobile */
-  .comment-tap-popover {
-    max-width: calc(100vw - 24px);
+  /* Click popover: full-width on mobile */
+  .critic-comment-popover {
+    width: calc(100vw - 24px);
+    max-height: 50vh;
     font-size: 14px;
   }
 
-  /* Make critic comments tappable (no hover on mobile) */
-  .critic-comment {
-    cursor: pointer;
-  }
+  /* Suppress hover bubbles on mobile; click popover handles it */
   .critic-comment .critic-comment-bubble {
-    display: none !important; /* suppress hover bubbles; tap popover handles it */
+    display: none !important;
   }
 }
 

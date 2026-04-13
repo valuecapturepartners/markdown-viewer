@@ -86,13 +86,6 @@ export const CriticComment = Node.create({
       contenteditable: 'false',
     },
     ['span', { class: 'critic-comment-icon' }, '\u{1F4AC}'],
-    ['span', { class: 'critic-comment-bubble' },
-      ['strong', {}, node.attrs.author],
-      ' ',
-      ['time', {}, node.attrs.date],
-      ['br'],
-      node.attrs.text,
-    ],
   ],
   parseHTML: () => [{
     tag: 'span.critic-comment',
@@ -102,4 +95,65 @@ export const CriticComment = Node.create({
       text:   (el.getAttribute('title') || '').replace(/^.*?\): /, ''),
     }),
   }],
+  addNodeView() {
+    return ({ node }) => {
+      const dom = document.createElement('span')
+      dom.className = 'critic-comment'
+      dom.contentEditable = 'false'
+      dom.dataset.author = node.attrs.author
+      dom.dataset.date = node.attrs.date
+      dom.title = `${node.attrs.author} (${node.attrs.date}): ${node.attrs.text}`
+
+      const icon = document.createElement('span')
+      icon.className = 'critic-comment-icon'
+      icon.textContent = '\u{1F4AC}'
+      dom.appendChild(icon)
+
+      dom.addEventListener('click', (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        // Remove any other open popover
+        document.querySelectorAll('.critic-comment-popover').forEach(el => el.remove())
+
+        const popover = document.createElement('div')
+        popover.className = 'critic-comment-popover'
+
+        const header = document.createElement('div')
+        header.className = 'ccp-header'
+        const author = document.createElement('strong')
+        author.textContent = node.attrs.author
+        const date = document.createElement('time')
+        date.textContent = node.attrs.date
+        const close = document.createElement('button')
+        close.className = 'ccp-close'
+        close.textContent = '\u2715'
+        close.addEventListener('click', (ev) => { ev.stopPropagation(); popover.remove() })
+        header.append(author, date, close)
+
+        const body = document.createElement('div')
+        body.className = 'ccp-body'
+        body.textContent = node.attrs.text
+
+        popover.append(header, body)
+
+        // Position near the icon
+        const rect = dom.getBoundingClientRect()
+        popover.style.position = 'fixed'
+        popover.style.left = Math.min(rect.left, window.innerWidth - 300) + 'px'
+        popover.style.top = (rect.bottom + 6) + 'px'
+        document.body.appendChild(popover)
+
+        // Close on outside click
+        const onOutside = (ev) => {
+          if (!popover.contains(ev.target) && !dom.contains(ev.target)) {
+            popover.remove()
+            document.removeEventListener('pointerdown', onOutside, true)
+          }
+        }
+        setTimeout(() => document.addEventListener('pointerdown', onOutside, true), 0)
+      })
+
+      return { dom }
+    }
+  },
 })

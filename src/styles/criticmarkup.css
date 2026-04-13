@@ -81,37 +81,94 @@ mark.critic-highlight {
   line-height: 1;
 }
 
+/* Hover bubble for marked-plugin rendered comments (preview/source view) */
 .critic-comment-bubble {
   display: none;
   position: absolute;
   bottom: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
   background: var(--bg-2);
   border: 1px solid var(--text-4);
-  border-radius: 6px;
-  padding: 8px 12px;
-  font-size: 12px;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
   color: var(--text-2);
-  white-space: nowrap;
-  max-width: 320px;
   white-space: normal;
+  width: 280px;
+  max-height: 200px;
+  overflow-y: auto;
   z-index: 100;
-  box-shadow: 0 4px 12px var(--shadow);
+  box-shadow: 0 4px 16px var(--shadow);
   pointer-events: none;
 }
 
 .critic-comment-bubble strong {
   color: var(--blue);
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .critic-comment-bubble time {
   color: var(--text-3);
   font-size: 11px;
-  margin-left: 4px;
+  margin-left: 6px;
 }
 
 .critic-comment:hover .critic-comment-bubble {
   display: block;
+}
+
+/* Click-to-open popover for tiptap editor comments */
+.critic-comment-popover {
+  background: var(--bg-2);
+  border: 1px solid var(--text-4);
+  border-radius: 10px;
+  padding: 0;
+  width: 280px;
+  max-height: 300px;
+  z-index: 1000;
+  box-shadow: 0 8px 24px var(--shadow);
+  overflow: hidden;
+  font-size: 13px;
+}
+
+.ccp-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--text-4);
+  background: var(--bg-3, var(--bg-2));
+}
+
+.ccp-header strong {
+  color: var(--blue);
+  font-size: 13px;
+}
+
+.ccp-header time {
+  color: var(--text-3);
+  font-size: 11px;
+  flex: 1;
+}
+
+.ccp-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-3);
+  font-size: 14px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+}
+.ccp-close:hover { background: var(--text-4); color: var(--text-1); }
+
+.ccp-body {
+  padding: 10px 14px;
+  max-height: 220px;
+  overflow-y: auto;
+  color: var(--text-1);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
