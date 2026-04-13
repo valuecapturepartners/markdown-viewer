@@ -268,7 +268,7 @@ export default function Editor({ onOpenCapture, onOpenKanban, hideSidebar, onBac
 
   const openCommentDialog = (selText) => {
     const sel =
-      selText !== undefined
+      typeof selText === "string"
         ? selText
         : tiptapRef.current?.getSelection() ||
           editorRef.current?.getSelection() ||
