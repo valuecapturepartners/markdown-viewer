@@ -1,7 +1,4 @@
-// Match checkbox items: - [ ] text / - [x] text
-// AND plain list items that contain pipe-delimited fields: - text | field:val
-const CHECKBOX_RE = /^- \[([ xX])\] (.+)$/;
-const PLAIN_TASK_RE = /^- (.+\|.+)$/;
+const TASK_RE = /^- \[([ xX])\] (.+)$/;
 const INDENT_RE = /^[ \t]+/;
 
 export function parseBoard(content, boardMeta = {}) {
@@ -11,14 +8,11 @@ export function parseBoard(content, boardMeta = {}) {
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    const cm = line.match(CHECKBOX_RE);
-    const pm = !cm ? line.match(PLAIN_TASK_RE) : null;
-    if (!cm && !pm) continue;
+    const m = line.match(TASK_RE);
+    if (!m) continue;
 
-    // Checkbox provides explicit done; plain items infer from status/✅ below
-    const hasCheckbox = !!cm;
-    const checkboxDone = hasCheckbox && cm[1] !== " ";
-    let rest = hasCheckbox ? cm[2] : pm[1];
+    const done = m[1] !== " ";
+    let rest = m[2];
 
     // Extract done date: ✅ YYYY-MM-DD at end
     let doneDate = "";
@@ -79,10 +73,6 @@ export function parseBoard(content, boardMeta = {}) {
     }
 
     // For plain items (no checkbox), infer done from status field or ✅ marker
-    const done = hasCheckbox
-      ? checkboxDone
-      : (fields.status === "done" || !!doneDate);
-
     tasks.push({
       id: `${fileId}:${i}`,
       fileId,
