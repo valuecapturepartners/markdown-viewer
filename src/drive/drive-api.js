@@ -185,13 +185,13 @@ export async function saveToFolder(token, folderId, filename, content) {
 
 // Search across all drives for files named board.md.
 // Drive API name= is case-sensitive, so we use `name contains` (which is
-// case-insensitive) and filter client-side for an exact match.
+// case-insensitive) and filter client-side.
 export async function findBoardFiles(token) {
   const q = "name contains 'board' and trashed=false";
   const params = new URLSearchParams({
     q,
     corpora: "allDrives",
-    fields: "files(id,name,parents,modifiedTime)",
+    fields: "files(id,name,mimeType,parents,modifiedTime)",
     pageSize: "200",
     ...SHARED,
   });
@@ -200,9 +200,14 @@ export async function findBoardFiles(token) {
   });
   if (!res.ok) throw new Error(`findBoardFiles failed: ${res.status}`);
   const data = await res.json();
-  return (data.files || []).filter(
-    (f) => f.name.toLowerCase() === "board.md",
-  );
+  // Accept board.md (any case) — exclude Google Docs/Sheets/folders
+  return (data.files || []).filter((f) => {
+    const name = f.name.toLowerCase();
+    if (name !== "board.md") return false;
+    const mime = f.mimeType || "";
+    if (mime.startsWith("application/vnd.google-apps.")) return false;
+    return true;
+  });
 }
 
 // Walk parent chain to build a human-readable folder path (for board labels).
