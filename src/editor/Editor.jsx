@@ -24,6 +24,7 @@ export default function Editor({ onOpenCapture, onOpenKanban, hideSidebar, onBac
   const editorRef = useRef(null);
   const tiptapRef = useRef(null);
   const autosaveTimer = useRef(null);
+  const fileLoaded = useRef(false);
 
   const [content, setContent] = useState("");
   const [currentFile, setCurrentFile] = useState(() => {
@@ -108,6 +109,7 @@ export default function Editor({ onOpenCapture, onOpenKanban, hideSidebar, onBac
           name = meta.name;
         }
         const text = await readFile(accessToken, fileId);
+        fileLoaded.current = true;
         setContent(text);
         setCurrentFile({ id: fileId, name });
         setIsTracking(hasCriticMarkup(text));
@@ -125,8 +127,10 @@ export default function Editor({ onOpenCapture, onOpenKanban, hideSidebar, onBac
   // When mobile shell picks a file, load it
   useEffect(() => {
     if (!fileToOpen?.id || !accessToken) return;
+    fileLoaded.current = false;
     readFile(accessToken, fileToOpen.id)
       .then((text) => {
+        fileLoaded.current = true;
         setContent(text);
         setCurrentFile({ id: fileToOpen.id, name: fileToOpen.name });
         setIsTracking(hasCriticMarkup(text));
@@ -147,12 +151,12 @@ export default function Editor({ onOpenCapture, onOpenKanban, hideSidebar, onBac
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Autosave: 2 s after last content change (only when a file is open)
+  // Autosave: 2 s after last content change (only when a file is open AND loaded)
   useEffect(() => {
-    if (!currentFile) return;
+    if (!currentFile || !fileLoaded.current) return;
     setSaveStatus("Unsaved");
     clearTimeout(autosaveTimer.current);
-    autosaveTimer.current = setTimeout(() => handleSave(), 2000);
+    autosaveTimer.current = setTimeout(() => handleSaveRef.current(), 2000);
     return () => clearTimeout(autosaveTimer.current);
   }, [content]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -170,8 +174,10 @@ export default function Editor({ onOpenCapture, onOpenKanban, hideSidebar, onBac
 
   const handleFilePicked = useCallback(
     async ({ id, name }) => {
+      fileLoaded.current = false;
       try {
         const text = await readFile(accessToken, id);
+        fileLoaded.current = true;
         setContent(text);
         setCurrentFile({ id, name });
         setIsTracking(hasCriticMarkup(text));
@@ -188,6 +194,7 @@ export default function Editor({ onOpenCapture, onOpenKanban, hideSidebar, onBac
 
   const handleSave = useCallback(async () => {
     if (!currentFile) return;
+    if (!fileLoaded.current) return;
     setIsSaving(true);
     setSaveStatus("Saving…");
     try {
@@ -201,6 +208,8 @@ export default function Editor({ onOpenCapture, onOpenKanban, hideSidebar, onBac
       setIsSaving(false);
     }
   }, [accessToken, currentFile, content]);
+  const handleSaveRef = useRef(handleSave);
+  useEffect(() => { handleSaveRef.current = handleSave; }, [handleSave]);
 
   const handleAcceptAll = useCallback(async () => {
     const clean = acceptAll(content);
@@ -248,8 +257,10 @@ export default function Editor({ onOpenCapture, onOpenKanban, hideSidebar, onBac
     async ({ id, name }) => {
       try {
         const text = await readFile(accessToken, id);
+        fileLoaded.current = true;
         setContent(text);
       } catch {
+        fileLoaded.current = true;
         setContent("");
       }
       setCurrentFile({ id, name });
@@ -309,6 +320,7 @@ export default function Editor({ onOpenCapture, onOpenKanban, hideSidebar, onBac
           <button
             className="app-title desktop-only"
             onClick={() => {
+              fileLoaded.current = false;
               setCurrentFile(null);
               setContent("");
               localStorage.removeItem(LAST_FILE_KEY);
