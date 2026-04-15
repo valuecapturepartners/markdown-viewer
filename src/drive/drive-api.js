@@ -183,14 +183,16 @@ export async function saveToFolder(token, folderId, filename, content) {
   return createFile(token, filename, content, folderId);
 }
 
-// Search across all drives for files named board.md
+// Search across all drives for files named board.md.
+// Drive API name= is case-sensitive, so we use `name contains` (which is
+// case-insensitive) and filter client-side for an exact match.
 export async function findBoardFiles(token) {
-  const q = "name='board.md' and trashed=false";
+  const q = "name contains 'board' and trashed=false";
   const params = new URLSearchParams({
     q,
     corpora: "allDrives",
     fields: "files(id,name,parents,modifiedTime)",
-    pageSize: "100",
+    pageSize: "200",
     ...SHARED,
   });
   const res = await fetch(`${BASE}/files?${params}`, {
@@ -198,7 +200,9 @@ export async function findBoardFiles(token) {
   });
   if (!res.ok) throw new Error(`findBoardFiles failed: ${res.status}`);
   const data = await res.json();
-  return data.files || [];
+  return (data.files || []).filter(
+    (f) => f.name.toLowerCase() === "board.md",
+  );
 }
 
 // Walk parent chain to build a human-readable folder path (for board labels).
