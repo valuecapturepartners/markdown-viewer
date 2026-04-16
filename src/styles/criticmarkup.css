@@ -173,13 +173,27 @@ mark.critic-highlight {
   word-break: break-word;
 }
 
+/* ── Thread label (replaces individual bubble icons) ──── */
+.critic-comment-thread-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--blue);
+  white-space: nowrap;
+}
+
+/* Hide non-first comments in a thread */
+.critic-comment-hidden {
+  display: none !important;
+}
+
 /* ── Resolved comments ────────────────────────────────── */
 .critic-comment-resolved {
   opacity: 0.5;
 }
 
-.critic-comment-resolved .critic-comment-icon {
+.critic-comment-resolved .critic-comment-thread-label {
   color: var(--green);
+  text-decoration: line-through;
 }
 
 /* ── @mention pills ───────────────────────────────────── */
@@ -193,14 +207,70 @@ mark.critic-highlight {
   font-size: 0.92em;
 }
 
-/* ── Popover actions bar ──────────────────────────────── */
-.ccp-actions {
+/* ── Thread popover ───────────────────────────────────── */
+.ccp-thread-popover {
+  width: 320px;
+  max-height: 440px;
   display: flex;
-  gap: 6px;
-  padding: 8px 14px;
-  border-top: 1px solid var(--text-4);
+  flex-direction: column;
 }
 
+.ccp-thread-body {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 280px;
+}
+
+.ccp-thread-entry {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--text-4);
+}
+.ccp-thread-entry:last-child { border-bottom: none; }
+
+.ccp-entry-resolved {
+  opacity: 0.5;
+}
+
+.ccp-entry-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.ccp-entry-header strong {
+  color: var(--blue);
+  font-size: 12px;
+}
+.ccp-entry-header time {
+  color: var(--text-3);
+  font-size: 11px;
+  flex: 1;
+}
+
+.ccp-entry-resolve {
+  background: transparent;
+  border: none;
+  color: var(--text-4);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  transition: color 0.1s, background 0.1s;
+}
+.ccp-entry-resolve:hover {
+  color: var(--text-2);
+  background: var(--bg-hover);
+}
+
+.ccp-entry-body {
+  color: var(--text-1);
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── Action buttons ───────────────────────────────────── */
 .ccp-action-btn {
   background: transparent;
   border: 1px solid var(--border-2, var(--text-4));
@@ -215,9 +285,6 @@ mark.critic-highlight {
   background: var(--bg-hover);
   color: var(--text);
 }
-
-.ccp-reply-btn { color: var(--blue); border-color: color-mix(in srgb, var(--blue) 40%, transparent); }
-.ccp-reply-btn:hover { background: color-mix(in srgb, var(--blue) 10%, transparent); }
 
 .ccp-send-btn { background: var(--blue); color: #fff; border-color: var(--blue); }
 .ccp-send-btn:hover { opacity: 0.9; background: var(--blue); color: #fff; }

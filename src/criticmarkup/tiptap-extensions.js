@@ -87,6 +87,70 @@ function renderCommentText(text, container) {
   }
 }
 
+// Collect a run of adjacent criticComment nodes starting at a given position
+function getCommentThread(doc, startPos) {
+  const comments = []
+  let pos = startPos
+  while (pos < doc.content.size) {
+    const nodeAt = doc.nodeAt(pos)
+    if (!nodeAt || nodeAt.type.name !== 'criticComment') break
+    comments.push({ node: nodeAt, pos })
+    pos += nodeAt.nodeSize
+  }
+  return comments
+}
+
+// Check if this comment is the first in its run of adjacent comments
+function isFirstInThread(doc, pos) {
+  if (pos <= 0) return true
+  const before = doc.nodeAt(pos - 1)
+  return !before || before.type.name !== 'criticComment'
+}
+
+// Build a single comment entry in the thread popover
+function buildCommentEntry(comment, index, threadComments, editor, popover) {
+  const entry = document.createElement('div')
+  entry.className = `ccp-thread-entry${comment.node.attrs.resolved ? ' ccp-entry-resolved' : ''}`
+
+  const entryHeader = document.createElement('div')
+  entryHeader.className = 'ccp-entry-header'
+  const authorEl = document.createElement('strong')
+  authorEl.textContent = comment.node.attrs.author
+  const dateEl = document.createElement('time')
+  dateEl.textContent = comment.node.attrs.date
+  entryHeader.append(authorEl, dateEl)
+
+  // Resolve button per entry
+  const resolveBtn = document.createElement('button')
+  resolveBtn.className = 'ccp-entry-resolve'
+  resolveBtn.textContent = comment.node.attrs.resolved ? 'Unresolve' : 'Resolve'
+  resolveBtn.title = comment.node.attrs.resolved ? 'Unresolve this comment' : 'Resolve this comment'
+  resolveBtn.addEventListener('click', (ev) => {
+    ev.stopPropagation()
+    const pos = comment.pos
+    if (typeof pos === 'number') {
+      editor.chain().focus()
+        .command(({ tr }) => {
+          tr.setNodeMarkup(pos, undefined, {
+            ...comment.node.attrs,
+            resolved: !comment.node.attrs.resolved,
+          })
+          return true
+        })
+        .run()
+    }
+    popover.remove()
+  })
+  entryHeader.appendChild(resolveBtn)
+
+  const entryBody = document.createElement('div')
+  entryBody.className = 'ccp-entry-body'
+  renderCommentText(comment.node.attrs.text, entryBody)
+
+  entry.append(entryHeader, entryBody)
+  return entry
+}
+
 export const CriticComment = Node.create({
   name: 'criticComment',
   group: 'inline',
@@ -122,145 +186,131 @@ export const CriticComment = Node.create({
   addNodeView() {
     return ({ node, getPos, editor }) => {
       const dom = document.createElement('span')
-      dom.className = `critic-comment${node.attrs.resolved ? ' critic-comment-resolved' : ''}`
       dom.contentEditable = 'false'
-      dom.dataset.author = node.attrs.author
-      dom.dataset.date = node.attrs.date
-      dom.dataset.resolved = node.attrs.resolved ? 'true' : 'false'
-      dom.title = `${node.attrs.author} (${node.attrs.date}): ${node.attrs.text}`
 
-      const icon = document.createElement('span')
-      icon.className = 'critic-comment-icon'
-      icon.textContent = node.attrs.resolved ? '\u2713' : '\u{1F4AC}'
-      dom.appendChild(icon)
+      const pos = getPos()
+      const doc = editor.state.doc
+      const first = isFirstInThread(doc, pos)
+
+      if (!first) {
+        // Not the first in a thread — hide this node, the first one renders the group
+        dom.className = 'critic-comment critic-comment-hidden'
+        return { dom }
+      }
+
+      // First in thread — collect all adjacent comments
+      const threadComments = getCommentThread(doc, pos)
+      const count = threadComments.length
+      const allResolved = threadComments.every(c => c.node.attrs.resolved)
+
+      dom.className = `critic-comment critic-comment-thread${allResolved ? ' critic-comment-resolved' : ''}`
+
+      const label = document.createElement('span')
+      label.className = 'critic-comment-thread-label'
+      if (count === 1) {
+        label.textContent = `${node.attrs.author}`
+      } else {
+        label.textContent = `Thread (${count})`
+      }
+      dom.appendChild(label)
 
       dom.addEventListener('click', (e) => {
         e.preventDefault()
         e.stopPropagation()
-        // Remove any other open popover
         document.querySelectorAll('.critic-comment-popover').forEach(el => el.remove())
 
-        const popover = document.createElement('div')
-        popover.className = 'critic-comment-popover'
+        // Re-read thread from current doc state (may have changed)
+        const currentPos = getPos()
+        const currentDoc = editor.state.doc
+        const currentThread = getCommentThread(currentDoc, currentPos)
 
-        // Header
+        const popover = document.createElement('div')
+        popover.className = 'critic-comment-popover ccp-thread-popover'
+
+        // Thread header
         const header = document.createElement('div')
         header.className = 'ccp-header'
-        const authorEl = document.createElement('strong')
-        authorEl.textContent = node.attrs.author
-        const dateEl = document.createElement('time')
-        dateEl.textContent = node.attrs.date
+        const titleEl = document.createElement('strong')
+        titleEl.textContent = currentThread.length === 1 ? 'Comment' : `Thread (${currentThread.length})`
         const close = document.createElement('button')
         close.className = 'ccp-close'
         close.textContent = '\u2715'
         close.addEventListener('click', (ev) => { ev.stopPropagation(); popover.remove() })
-        header.append(authorEl, dateEl, close)
+        header.append(titleEl, close)
+        popover.appendChild(header)
 
-        // Body with @mention rendering
-        const body = document.createElement('div')
-        body.className = 'ccp-body'
-        renderCommentText(node.attrs.text, body)
+        // Thread entries
+        const threadBody = document.createElement('div')
+        threadBody.className = 'ccp-thread-body'
+        currentThread.forEach((comment, i) => {
+          threadBody.appendChild(buildCommentEntry(comment, i, currentThread, editor, popover))
+        })
+        popover.appendChild(threadBody)
 
-        // Actions bar (resolve + reply)
-        const actions = document.createElement('div')
-        actions.className = 'ccp-actions'
-
-        const resolveBtn = document.createElement('button')
-        resolveBtn.className = 'ccp-action-btn'
-        resolveBtn.textContent = node.attrs.resolved ? 'Unresolve' : 'Resolve'
-        resolveBtn.addEventListener('click', (ev) => {
-          ev.stopPropagation()
-          const pos = getPos()
-          if (typeof pos === 'number') {
-            editor.chain().focus()
-              .command(({ tr }) => {
-                tr.setNodeMarkup(pos, undefined, {
-                  ...node.attrs,
-                  resolved: !node.attrs.resolved,
-                })
-                return true
-              })
-              .run()
-          }
+        // Reply input at the bottom
+        const replyBox = document.createElement('div')
+        replyBox.className = 'ccp-reply-box'
+        const replyInput = document.createElement('textarea')
+        replyInput.className = 'ccp-reply-input'
+        replyInput.placeholder = 'Reply...'
+        replyInput.rows = 2
+        const replyActions = document.createElement('div')
+        replyActions.className = 'ccp-reply-actions'
+        const sendBtn = document.createElement('button')
+        sendBtn.className = 'ccp-action-btn ccp-send-btn'
+        sendBtn.textContent = 'Reply'
+        sendBtn.addEventListener('click', () => {
+          const replyText = replyInput.value.trim()
+          if (!replyText) return
+          // Insert after the last comment in the thread
+          const lastComment = currentThread[currentThread.length - 1]
+          const insertPos = lastComment.pos + lastComment.node.nodeSize
+          const ext = editor.extensionManager.extensions.find(e => e.name === 'trackChanges')
+          const handle = ext?.options.author || 'unknown'
+          const date = new Date().toISOString().split('T')[0]
+          const h = handle.startsWith('@') ? handle : `@${handle}`
+          editor.chain().focus()
+            .insertContentAt(insertPos, {
+              type: 'criticComment',
+              attrs: { author: h, date, text: replyText, resolved: false },
+            })
+            .run()
           popover.remove()
         })
-
-        const replyBtn = document.createElement('button')
-        replyBtn.className = 'ccp-action-btn ccp-reply-btn'
-        replyBtn.textContent = 'Reply'
-        replyBtn.addEventListener('click', (ev) => {
-          ev.stopPropagation()
-          // Show reply input
-          replyBtn.style.display = 'none'
-          const replyBox = document.createElement('div')
-          replyBox.className = 'ccp-reply-box'
-          const replyInput = document.createElement('textarea')
-          replyInput.className = 'ccp-reply-input'
-          replyInput.placeholder = 'Write a reply...'
-          replyInput.rows = 2
-          const replyActions = document.createElement('div')
-          replyActions.className = 'ccp-reply-actions'
-          const cancelBtn = document.createElement('button')
-          cancelBtn.className = 'ccp-action-btn'
-          cancelBtn.textContent = 'Cancel'
-          cancelBtn.addEventListener('click', () => {
-            replyBox.remove()
-            replyBtn.style.display = ''
-          })
-          const sendBtn = document.createElement('button')
-          sendBtn.className = 'ccp-action-btn ccp-send-btn'
-          sendBtn.textContent = 'Send'
-          sendBtn.addEventListener('click', () => {
-            const replyText = replyInput.value.trim()
-            if (!replyText) return
-            const pos = getPos()
-            if (typeof pos === 'number') {
-              // Get current user handle from the editor's trackChanges author
-              const ext = editor.extensionManager.extensions.find(e => e.name === 'trackChanges')
-              const handle = ext?.options.author || 'unknown'
-              const date = new Date().toISOString().split('T')[0]
-              const h = handle.startsWith('@') ? handle : `@${handle}`
-              // Insert reply comment right after this comment node
-              editor.chain().focus()
-                .insertContentAt(pos + 1, {
-                  type: 'criticComment',
-                  attrs: { author: h, date, text: replyText, resolved: false },
-                })
-                .run()
-            }
-            popover.remove()
-          })
-          replyInput.addEventListener('keydown', (ke) => {
-            if (ke.key === 'Enter' && (ke.ctrlKey || ke.metaKey)) {
-              ke.preventDefault()
-              sendBtn.click()
-            }
-            if (ke.key === 'Escape') cancelBtn.click()
-          })
-          replyActions.append(cancelBtn, sendBtn)
-          replyBox.append(replyInput, replyActions)
-          popover.appendChild(replyBox)
-          setTimeout(() => replyInput.focus(), 0)
+        replyInput.addEventListener('keydown', (ke) => {
+          if (ke.key === 'Enter' && (ke.ctrlKey || ke.metaKey)) {
+            ke.preventDefault()
+            sendBtn.click()
+          }
+          if (ke.key === 'Escape') popover.remove()
         })
+        replyActions.appendChild(sendBtn)
+        replyBox.append(replyInput, replyActions)
+        popover.appendChild(replyBox)
 
-        actions.append(resolveBtn, replyBtn)
-        popover.append(header, body, actions)
-
-        // Position near the icon
+        // Position near the label
         const rect = dom.getBoundingClientRect()
         popover.style.position = 'fixed'
-        popover.style.left = Math.min(rect.left, window.innerWidth - 300) + 'px'
+        popover.style.left = Math.min(rect.left, window.innerWidth - 320) + 'px'
         popover.style.top = (rect.bottom + 6) + 'px'
+        // If it would go off the bottom, position above instead
+        const spaceBelow = window.innerHeight - rect.bottom - 6
+        if (spaceBelow < 300) {
+          popover.style.top = ''
+          popover.style.bottom = (window.innerHeight - rect.top + 6) + 'px'
+        }
         document.body.appendChild(popover)
 
-        // Close on outside click
         const onOutside = (ev) => {
           if (!popover.contains(ev.target) && !dom.contains(ev.target)) {
             popover.remove()
             document.removeEventListener('pointerdown', onOutside, true)
           }
         }
-        setTimeout(() => document.addEventListener('pointerdown', onOutside, true), 0)
+        setTimeout(() => {
+          document.addEventListener('pointerdown', onOutside, true)
+          replyInput.focus()
+        }, 0)
       })
 
       return { dom }

@@ -291,19 +291,20 @@ export default function Editor({ onOpenCapture, onOpenKanban, hideSidebar, onBac
   const handleCommentInsert = (markup, handle, commentText, opts = {}) => {
     if (opts.discussion) {
       // Document-level comment: append to ## Discussion section in raw markdown
+      let newContent;
       setContent((prev) => {
         const discussionHeader = '## Discussion';
         if (prev.includes(discussionHeader)) {
-          // Append after existing Discussion section content
-          return prev.trimEnd() + '\n\n' + markup;
+          newContent = prev.trimEnd() + '\n\n' + markup;
+        } else {
+          newContent = prev.trimEnd() + '\n\n' + discussionHeader + '\n\n' + markup;
         }
-        // Create Discussion section
-        return prev.trimEnd() + '\n\n' + discussionHeader + '\n\n' + markup;
+        return newContent;
       });
-      // Force tiptap to re-render
+      // Force tiptap to re-render with the new content
       setTimeout(() => {
-        if (tiptapRef.current) {
-          tiptapRef.current.forceContent(content);
+        if (tiptapRef.current && newContent) {
+          tiptapRef.current.forceContent(newContent);
         }
       }, 50);
     } else if (tiptapRef.current) {
