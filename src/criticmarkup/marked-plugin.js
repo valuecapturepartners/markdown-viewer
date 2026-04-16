@@ -46,16 +46,23 @@ function applyCriticMarkup(html) {
   )
 
   // 5. Comment  {>> @handle (date): text <<}  (escaped: &gt;&gt; … &lt;&lt;)
+  //    Also supports [resolved] marker: {>> @handle (date) [resolved]: text <<}
   html = html.replace(/\{&gt;&gt;([\s\S]*?)&lt;&lt;\}/g, (m, content) => {
     // content is already HTML-escaped; decode just enough to parse structure
     const raw = content.trim()
       .replace(/&quot;/g, '"')
       .replace(/&amp;/g, '&')
-    const vcpMatch = raw.match(/^(@\w+)\s+\(([^)]+)\):\s*(.+)$/)
+    const vcpMatch = raw.match(/^(@[\w.-]+)\s+\(([^)]+)\)\s*(\[resolved\])?\s*:\s*(.+)$/)
     if (vcpMatch) {
-      const [, handle, date, text] = vcpMatch
+      const [, handle, date, resolvedTag, text] = vcpMatch
+      const resolved = !!resolvedTag
       const safeText = text.replace(/"/g, '&quot;')
-      return `<span class="critic-comment" data-author="${handle}" data-date="${date}" title="${handle} (${date}): ${safeText}"><span class="critic-comment-icon">&#x1F4AC;</span><span class="critic-comment-bubble"><strong>${handle}</strong> <time>${date}</time><br>${safeText}</span></span>`
+      const resolvedClass = resolved ? ' critic-comment-resolved' : ''
+      const resolvedAttr = resolved ? ' data-resolved="true"' : ' data-resolved="false"'
+      const iconChar = resolved ? '&#x2713;' : '&#x1F4AC;'
+      // Render @mentions as pills in bubble
+      const renderedText = safeText.replace(/@[\w.-]+/g, mention => `<span class="ccp-mention">${mention}</span>`)
+      return `<span class="critic-comment${resolvedClass}" data-author="${handle}" data-date="${date}"${resolvedAttr} title="${handle} (${date}): ${safeText}"><span class="critic-comment-icon">${iconChar}</span><span class="critic-comment-bubble"><strong>${handle}</strong> <time>${date}</time><br>${renderedText}</span></span>`
     }
     return `<span class="critic-comment" title="${raw}"><span class="critic-comment-icon">&#x1F4AC;</span><span class="critic-comment-bubble">${raw}</span></span>`
   })

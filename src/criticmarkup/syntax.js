@@ -43,10 +43,18 @@ export function rejectAll(md) {
     .trim()
 }
 
-export function formatVCPComment(handle, text) {
+export function formatVCPComment(handle, text, { resolved = false } = {}) {
   const date = new Date().toISOString().split('T')[0]
   const h = handle.startsWith('@') ? handle : `@${handle}`
-  return `{>> ${h} (${date}): ${text} <<}`
+  const r = resolved ? ' [resolved]' : ''
+  return `{>> ${h} (${date})${r}: ${text} <<}`
+}
+
+// Parse a CriticMarkup comment body into structured fields
+export function parseCommentAttrs(raw) {
+  const m = raw.trim().match(/^@([\w.-]+)\s*\((\d{4}-\d{2}-\d{2})\)\s*(\[resolved\])?\s*:\s*([\s\S]*)$/)
+  if (m) return { author: `@${m[1]}`, date: m[2], resolved: !!m[3], text: m[4].trim() }
+  return { author: '', date: '', resolved: false, text: raw.trim() }
 }
 
 // Wraps currently selected text with a CriticMarkup comment.

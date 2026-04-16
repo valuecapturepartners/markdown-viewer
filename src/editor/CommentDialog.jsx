@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import { useAuth } from '../auth/auth-context.jsx'
 import { buildCommentInsertion } from '../criticmarkup/syntax.js'
 
-export default function CommentDialog({ selectedText, onInsert, onClose }) {
+export default function CommentDialog({ selectedText, onInsert, onClose, mode = 'inline' }) {
   const { userInfo } = useAuth()
   const defaultHandle = userInfo?.name?.split(' ')[0]?.toLowerCase() || ''
   const [handle, setHandle] = useState(defaultHandle)
   const [text, setText] = useState('')
+  const [commentMode, setCommentMode] = useState(selectedText ? 'inline' : mode)
   const textRef = useRef(null)
 
   useEffect(() => {
@@ -16,8 +17,14 @@ export default function CommentDialog({ selectedText, onInsert, onClose }) {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (!handle.trim() || !text.trim()) return
-    const markup = buildCommentInsertion(handle.trim(), text.trim(), selectedText || '')
-    onInsert(markup, handle.trim(), text.trim())
+    if (commentMode === 'discussion') {
+      // Document-level comment — signal to parent to append to ## Discussion
+      const markup = buildCommentInsertion(handle.trim(), text.trim(), '')
+      onInsert(markup, handle.trim(), text.trim(), { discussion: true })
+    } else {
+      const markup = buildCommentInsertion(handle.trim(), text.trim(), selectedText || '')
+      onInsert(markup, handle.trim(), text.trim(), { discussion: false })
+    }
   }
 
   const handleKeyDown = (e) => {
@@ -33,10 +40,35 @@ export default function CommentDialog({ selectedText, onInsert, onClose }) {
           <button className="dialog-close" onClick={onClose} aria-label="Close">✕</button>
         </div>
 
-        {selectedText && (
+        {/* Mode toggle */}
+        <div className="comment-mode-toggle">
+          <button
+            className={`comment-mode-btn ${commentMode === 'inline' ? 'active' : ''}`}
+            onClick={() => setCommentMode('inline')}
+            type="button"
+          >
+            Inline
+          </button>
+          <button
+            className={`comment-mode-btn ${commentMode === 'discussion' ? 'active' : ''}`}
+            onClick={() => setCommentMode('discussion')}
+            type="button"
+          >
+            Discussion
+          </button>
+        </div>
+
+        {commentMode === 'inline' && selectedText && (
           <div className="dialog-selection-preview">
             <span className="label">Commenting on:</span>
             <blockquote>{selectedText.slice(0, 120)}{selectedText.length > 120 ? '…' : ''}</blockquote>
+          </div>
+        )}
+
+        {commentMode === 'discussion' && (
+          <div className="dialog-selection-preview">
+            <span className="label">Document-level comment</span>
+            <blockquote>Will be added to the Discussion section at the end of the document.</blockquote>
           </div>
         )}
 
@@ -57,7 +89,7 @@ export default function CommentDialog({ selectedText, onInsert, onClose }) {
               ref={textRef}
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder="Write your comment…"
+              placeholder={commentMode === 'discussion' ? 'Write a document-level comment…' : 'Write your comment…'}
               rows={4}
               required
             />
@@ -65,12 +97,14 @@ export default function CommentDialog({ selectedText, onInsert, onClose }) {
           <div className="dialog-preview-label">Will insert:</div>
           <code className="dialog-preview">
             {handle && text
-              ? buildCommentInsertion(handle, text, selectedText || '')
+              ? buildCommentInsertion(handle, text, commentMode === 'inline' ? (selectedText || '') : '')
               : '…'}
           </code>
           <div className="dialog-actions">
             <button type="button" className="btn-secondary" onClick={onClose}>Cancel</button>
-            <button type="submit" className="btn-primary">Insert (Ctrl+Enter)</button>
+            <button type="submit" className="btn-primary">
+              {commentMode === 'discussion' ? 'Add to Discussion (Ctrl+Enter)' : 'Insert (Ctrl+Enter)'}
+            </button>
           </div>
         </form>
       </div>

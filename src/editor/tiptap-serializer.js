@@ -36,7 +36,8 @@ function serializeInlineNode(node) {
       const h = (node.attrs?.author || '').startsWith('@')
         ? node.attrs.author
         : `@${node.attrs?.author || ''}`
-      return `{>> ${h} (${node.attrs?.date || ''}): ${node.attrs?.text || ''} <<}`
+      const resolved = node.attrs?.resolved ? ' [resolved]' : ''
+      return `{>> ${h} (${node.attrs?.date || ''})${resolved}: ${node.attrs?.text || ''} <<}`
     }
     default: {
       // Fallback: recurse into children

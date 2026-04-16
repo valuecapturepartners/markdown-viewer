@@ -288,8 +288,25 @@ export default function Editor({ onOpenCapture, onOpenKanban, hideSidebar, onBac
     setIsCommentOpen(true);
   };
 
-  const handleCommentInsert = (markup, handle, commentText) => {
-    if (tiptapRef.current) {
+  const handleCommentInsert = (markup, handle, commentText, opts = {}) => {
+    if (opts.discussion) {
+      // Document-level comment: append to ## Discussion section in raw markdown
+      setContent((prev) => {
+        const discussionHeader = '## Discussion';
+        if (prev.includes(discussionHeader)) {
+          // Append after existing Discussion section content
+          return prev.trimEnd() + '\n\n' + markup;
+        }
+        // Create Discussion section
+        return prev.trimEnd() + '\n\n' + discussionHeader + '\n\n' + markup;
+      });
+      // Force tiptap to re-render
+      setTimeout(() => {
+        if (tiptapRef.current) {
+          tiptapRef.current.forceContent(content);
+        }
+      }, 50);
+    } else if (tiptapRef.current) {
       // Tiptap is active: insert as a proper CriticComment node
       tiptapRef.current.insertComment({
         author: handle || userInfo?.name?.split(" ")[0]?.toLowerCase() || "",
