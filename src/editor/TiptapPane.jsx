@@ -85,12 +85,41 @@ function convertCheckboxLists(html) {
       const checked = cb?.hasAttribute("checked") || false;
       li.setAttribute("data-type", "taskItem");
       li.setAttribute("data-checked", String(checked));
-      cb?.remove();
-      // Wrap remaining inline content in <p> if not already block-level
-      if (!li.querySelector("p, div, blockquote, ul, ol")) {
-        const p = doc.createElement("p");
-        while (li.firstChild) p.appendChild(li.firstChild);
-        li.appendChild(p);
+      if (cb) {
+        const cbParent = cb.parentNode;
+        cb.remove();
+        // Trim the leading whitespace left by the removed checkbox marker
+        const firstText = cbParent?.firstChild;
+        if (firstText?.nodeType === Node.TEXT_NODE) {
+          firstText.textContent = firstText.textContent.replace(/^\s+/, "");
+        }
+      }
+      // If the li already has block-level children (e.g. <p> from a loose list),
+      // the text is already structured.  If it has a nested list but no wrapping
+      // <p>, collect the text nodes that precede the nested list and put them in
+      // a <p> so Tiptap's taskItem schema (paragraph block*) is satisfied without
+      // merging the details bullets into the task description.
+      if (!li.querySelector("p, div, blockquote")) {
+        const nestedList = li.querySelector("ul, ol");
+        if (nestedList) {
+          // Gather all nodes before the first nested list into a <p>
+          const beforeNodes = [];
+          let node = li.firstChild;
+          while (node && node !== nestedList) {
+            beforeNodes.push(node);
+            node = node.nextSibling;
+          }
+          if (beforeNodes.length > 0) {
+            const p = doc.createElement("p");
+            for (const n of beforeNodes) p.appendChild(n);
+            li.insertBefore(p, nestedList);
+          }
+        } else {
+          // No nested list — wrap all inline content in <p>
+          const p = doc.createElement("p");
+          while (li.firstChild) p.appendChild(li.firstChild);
+          li.appendChild(p);
+        }
       }
     }
   }
@@ -136,6 +165,9 @@ const TiptapPane = forwardRef(function TiptapPane(
     () => extractFrontmatter(content).frontmatter,
     [content],
   );
+  // True while setContentSafe is running — suppresses onUpdate so that
+  // programmatic content loads (file open, external sync) never trigger autosave.
+  const settingContentRef = useRef(false);
 
   const editor = useEditor({
     extensions: [
@@ -152,6 +184,7 @@ const TiptapPane = forwardRef(function TiptapPane(
     content: markdownToHtml(content),
     editable: !!onChange,
     onUpdate({ editor }) {
+      if (settingContentRef.current) return;
       const bodyMd = serializeToMarkdown(editor.getJSON());
       const md = frontmatterRef.current
         ? frontmatterRef.current + bodyMd
@@ -161,10 +194,13 @@ const TiptapPane = forwardRef(function TiptapPane(
     },
   });
 
-  // Set editor content without triggering track-changes (file loads, external syncs)
+  // Set editor content without triggering track-changes or autosave (file loads,
+  // external syncs).  settingContentRef suppresses onUpdate for the duration of
+  // the synchronous setContent call and any ProseMirror appendTransaction passes.
   const setContentSafe = useCallback(
     (md) => {
       if (!editor) return;
+      settingContentRef.current = true;
       frontmatterRef.current = extractRawFrontmatter(md);
       const ext = editor.extensionManager.extensions.find(
         (e) => e.name === "trackChanges",
@@ -173,6 +209,9 @@ const TiptapPane = forwardRef(function TiptapPane(
       if (ext) ext.options.tracking = false;
       editor.commands.setContent(markdownToHtml(md), false);
       if (ext) ext.options.tracking = prev;
+      // ProseMirror dispatches are synchronous, so all onUpdate calls triggered
+      // by setContent (including schema normalisation) have completed by now.
+      settingContentRef.current = false;
     },
     [editor],
   );
